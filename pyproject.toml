@@ -1,0 +1,56 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "arxiv-mcp-server"
+version = "1.0.0"
+description = "ArXiv Research Intelligence MCP Server — semantic search, RAG, and paper indexing for Claude"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+keywords = ["mcp", "arxiv", "rag", "llm", "research", "embeddings"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "mcp>=1.0.0",
+    "arxiv>=2.1.0",
+    "sentence-transformers>=3.0.0",
+    "pdfplumber>=0.11.0",
+    "httpx>=0.27.0",
+    "numpy>=1.26.0",
+    "torch>=2.0.0",
+]
+
+[project.optional-dependencies]
+qdrant = ["qdrant-client>=1.9.0"]
+dev = ["pytest>=8.0", "pytest-asyncio>=0.23", "black", "ruff", "mypy"]
+
+[project.scripts]
+arxiv-mcp = "src.server:main"
+
+[project.urls]
+Homepage = "https://github.com/yourusername/arxiv-mcp-server"
+Repository = "https://github.com/yourusername/arxiv-mcp-server"
+Issues = "https://github.com/yourusername/arxiv-mcp-server/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true

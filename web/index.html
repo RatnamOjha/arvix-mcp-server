@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ArXiv MCP — Research Intelligence for Claude</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#08080c;
+  --ink2:#0f0f16;
+  --ink3:#16161f;
+  --line:rgba(255,255,255,0.06);
+  --line2:rgba(255,255,255,0.1);
+  --gold:#c9a96e;
+  --gold2:#e8c98a;
+  --ice:#a8c4d4;
+  --text:#d4d4e0;
+  --muted:#6a6a80;
+  --dim:#3a3a4a;
+  --serif:'DM Serif Display',serif;
+  --mono:'DM Mono',monospace;
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{
+  background:var(--ink);
+  color:var(--text);
+  font-family:var(--mono);
+  font-weight:300;
+  overflow-x:hidden;
+  cursor:none;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── Cursor ─────────────────────────────────────────── */
+#c{position:fixed;z-index:9999;pointer-events:none;
+   width:5px;height:5px;background:var(--gold);border-radius:50%;
+   transform:translate(-50%,-50%);mix-blend-mode:difference;
+   transition:width .15s,height .15s}
+#cr{position:fixed;z-index:9998;pointer-events:none;
+    width:28px;height:28px;border:1px solid rgba(201,169,110,0.3);
+    border-radius:50%;transform:translate(-50%,-50%);
+    transition:width .3s,height .3s,border-color .3s}
+body:has(a:hover) #c,body:has(button:hover) #c{width:10px;height:10px}
+body:has(a:hover) #cr,body:has(button:hover) #cr{width:48px;height:48px;border-color:rgba(201,169,110,0.5)}
+
+/* ── Canvas ─────────────────────────────────────────── */
+#bg{position:fixed;inset:0;z-index:0;opacity:.6}
+
+/* ── Nav ────────────────────────────────────────────── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.4rem 3.5rem;
+  border-bottom:1px solid var(--line);
+  background:rgba(8,8,12,0.85);
+  backdrop-filter:blur(24px);
+}
+.logo{
+  font-family:var(--serif);font-size:1.1rem;
+  color:var(--gold);letter-spacing:0.02em;
+}
+.logo sub{
+  font-family:var(--mono);font-size:0.6rem;font-weight:300;
+  color:var(--muted);vertical-align:middle;margin-left:0.5rem;
+  letter-spacing:0.12em;text-transform:uppercase;
+}
+.nav-links{display:flex;gap:2.5rem;list-style:none}
+.nav-links a{
+  font-size:0.7rem;letter-spacing:0.14em;color:var(--muted);
+  text-decoration:none;text-transform:uppercase;transition:color .2s;
+}
+.nav-links a:hover{color:var(--gold)}
+.nav-cta{
+  font-family:var(--mono);font-size:0.68rem;letter-spacing:0.12em;
+  text-transform:uppercase;color:var(--gold);
+  border:1px solid rgba(201,169,110,0.35);
+  padding:.45rem 1.1rem;text-decoration:none;
+  transition:background .2s,border-color .2s;
+}
+.nav-cta:hover{background:rgba(201,169,110,0.07);border-color:rgba(201,169,110,0.6)}
+
+/* ── Hero ───────────────────────────────────────────── */
+#hero{
+  position:relative;z-index:1;
+  min-height:100svh;padding:0 3.5rem;
+  display:flex;flex-direction:column;justify-content:center;
+  gap:0;
+}
+.h-tag{
+  font-size:0.65rem;letter-spacing:0.22em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:2.2rem;
+  display:flex;align-items:center;gap:1rem;
+  opacity:0;animation:up .9s .2s forwards;
+}
+.h-tag::before{content:'';width:32px;height:1px;background:var(--gold);opacity:.4}
+h1{
+  font-family:var(--serif);
+  font-size:clamp(3.6rem,7.5vw,7rem);
+  line-height:1.0;letter-spacing:-0.01em;
+  margin-bottom:2.2rem;
+  opacity:0;animation:up .9s .35s forwards;
+}
+.h1-i{font-style:italic;color:var(--gold)}
+.h1-d{color:var(--dim)}
+.hero-copy{
+  font-size:.88rem;color:var(--muted);line-height:2.0;
+  max-width:480px;margin-bottom:3rem;
+  opacity:0;animation:up .9s .5s forwards;
+}
+.hero-copy span{color:var(--text)}
+.ctas{
+  display:flex;gap:1rem;flex-wrap:wrap;
+  opacity:0;animation:up .9s .65s forwards;
+}
+.btn{
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;
+  text-transform:uppercase;padding:.8rem 2rem;
+  text-decoration:none;transition:all .2s;
+}
+.btn-g{background:var(--gold);color:var(--ink);border:1px solid var(--gold)}
+.btn-g:hover{background:var(--gold2)}
+.btn-o{background:transparent;color:var(--text);border:1px solid var(--line2)}
+.btn-o:hover{border-color:var(--muted);color:var(--gold)}
+
+/* hero right col — terminal */
+.hero-inner{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;max-width:1200px;margin:0 auto;width:100%}
+.hero-left{opacity:0;animation:up .9s .2s forwards}
+.hero-right{opacity:0;animation:up .9s .7s forwards}
+
+/* ── Terminal ───────────────────────────────────────── */
+.term{
+  background:var(--ink2);border:1px solid var(--line2);
+  border-radius:4px;overflow:hidden;
+}
+.term-top{
+  background:var(--ink3);padding:.65rem 1rem;
+  display:flex;align-items:center;gap:.45rem;
+  border-bottom:1px solid var(--line);
+}
+.dot{width:9px;height:9px;border-radius:50%}
+.d1{background:#ff5f56}.d2{background:#ffbd2e}.d3{background:#27c93f}
+.term-label{margin-left:auto;font-size:.62rem;color:var(--muted);letter-spacing:.1em}
+.term-body{padding:1.4rem 1.4rem;font-size:.76rem;line-height:2.1;min-height:220px}
+.tp{color:var(--gold)}
+.tc{color:var(--text)}
+.to{color:var(--muted)}
+.tok{color:var(--ice)}
+.tcr{display:inline-block;width:7px;height:1em;background:var(--gold);vertical-align:text-bottom;animation:blink 1s step-end infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* ── Divider ────────────────────────────────────────── */
+.rule{
+  position:relative;z-index:1;
+  max-width:1200px;margin:0 auto;padding:0 3.5rem;
+  display:flex;align-items:center;gap:1.5rem;
+}
+.rule::before,.rule::after{content:'';flex:1;height:1px;background:var(--line)}
+.rule-txt{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);white-space:nowrap}
+
+/* ── Sections ───────────────────────────────────────── */
+.sect{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:7rem 3.5rem}
+.sect-eye{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.7rem}
+.sect-h{font-family:var(--serif);font-size:clamp(2rem,4vw,3.2rem);line-height:1.1;margin-bottom:3.5rem}
+.sect-hi{font-style:italic}
+
+/* ── Tools grid ─────────────────────────────────────── */
+.tools{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+.tool{
+  background:var(--ink2);padding:2.2rem 2rem;
+  position:relative;overflow:hidden;transition:background .3s;
+}
+.tool::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  transform:scaleX(0);transition:transform .4s;
+}
+.tool:hover{background:var(--ink3)}
+.tool:hover::after{transform:scaleX(1)}
+.t-n{font-size:.6rem;color:var(--dim);letter-spacing:.15em;margin-bottom:1.4rem;display:block}
+.t-name{font-size:.85rem;font-weight:500;color:var(--gold);margin-bottom:.5rem;letter-spacing:.04em}
+.t-sig{
+  font-size:.66rem;color:var(--ice);
+  background:rgba(168,196,212,0.07);
+  border:1px solid rgba(168,196,212,0.12);
+  display:inline-block;padding:.25rem .65rem;border-radius:2px;margin-bottom:1rem;
+}
+.t-desc{font-size:.78rem;color:var(--muted);line-height:1.85}
+
+/* ── How it works ───────────────────────────────────── */
+.steps{display:flex;flex-direction:column}
+.step{
+  display:grid;grid-template-columns:3.5rem 1fr;gap:1.5rem;
+  padding:1.8rem 0;border-bottom:1px solid var(--line);
+}
+.step:last-child{border-bottom:none}
+.s-n{font-size:.62rem;color:var(--gold);letter-spacing:.1em;padding-top:.1rem}
+.s-title{font-size:.88rem;font-weight:500;margin-bottom:.35rem;color:var(--text)}
+.s-desc{font-size:.76rem;color:var(--muted);line-height:1.85}
+.stack{background:var(--ink2);border:1px solid var(--line2);padding:2rem;position:sticky;top:5.5rem}
+.st-label{font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:1.4rem;padding-bottom:.8rem;border-bottom:1px solid var(--line)}
+.si{display:flex;align-items:center;gap:.75rem;padding:.55rem 0;border-bottom:1px solid var(--line);font-size:.76rem}
+.si:last-child{border-bottom:none}
+.sdot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.stag{margin-left:auto;font-size:.6rem;color:var(--dim);letter-spacing:.08em}
+.arch-grid{display:grid;grid-template-columns:1fr 1fr;gap:3.5rem;align-items:start;margin-top:3.5rem}
+
+/* ── Vectorless callout ─────────────────────────────── */
+.vless-box{
+  background:var(--ink2);border:1px solid rgba(201,169,110,0.2);
+  padding:2.5rem;margin-top:3.5rem;position:relative;overflow:hidden;
+}
+.vless-box::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+.vless-tag{
+  font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:1rem;display:flex;align-items:center;gap:.7rem;
+}
+.vless-tag::before{content:'◆';font-size:.5rem}
+.vless-title{font-family:var(--serif);font-size:1.6rem;margin-bottom:1rem;font-style:italic}
+.vless-copy{font-size:.8rem;color:var(--muted);line-height:2.0;max-width:640px}
+.vless-copy strong{color:var(--text);font-weight:500}
+.pipeline{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+  background:var(--line);border:1px solid var(--line);margin-top:1.5rem;
+}
+.pipe-step{background:var(--ink3);padding:1.2rem 1rem}
+.ps-n{font-size:.58rem;color:var(--dim);letter-spacing:.12em;margin-bottom:.5rem}
+.ps-name{font-size:.76rem;font-weight:500;color:var(--ice);margin-bottom:.3rem}
+.ps-desc{font-size:.68rem;color:var(--muted);line-height:1.7}
+
+/* ── Install ────────────────────────────────────────── */
+.install{display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line)}
+.ist{
+  background:var(--ink2);padding:1.8rem 2rem;
+  display:grid;grid-template-columns:2.5rem 1fr;gap:1.5rem;align-items:start;
+  transition:background .2s;
+}
+.ist:hover{background:var(--ink3)}
+.i-n{font-family:var(--serif);font-size:1.8rem;color:var(--dim);font-style:italic;line-height:1}
+.i-title{font-size:.82rem;font-weight:500;color:var(--text);margin-bottom:.4rem}
+.i-code{
+  background:var(--ink);border:1px solid var(--line);border-radius:2px;
+  padding:.65rem .9rem;font-size:.73rem;color:var(--ice);
+  margin-top:.5rem;overflow-x:auto;white-space:pre;line-height:1.8;
+}
+.i-note{font-size:.72rem;color:var(--muted);margin-top:.45rem;line-height:1.7}
+
+/* ── Footer ─────────────────────────────────────────── */
+footer{
+  position:relative;z-index:1;
+  border-top:1px solid var(--line);
+  padding:3rem 3.5rem;
+  max-width:1200px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:1rem;
+}
+.f-logo{font-family:var(--serif);font-size:1.4rem;font-style:italic;color:var(--dim)}
+.f-links{display:flex;gap:2rem}
+.f-links a{font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s}
+.f-links a:hover{color:var(--gold)}
+.f-copy{font-size:.62rem;color:var(--dim);letter-spacing:.05em}
+
+/* ── Reveal ─────────────────────────────────────────── */
+.rv{opacity:0;transform:translateY(20px);transition:opacity .7s,transform .7s}
+.rv.on{opacity:1;transform:translateY(0)}
+.rv2{opacity:0;transform:translateY(20px);transition:opacity .7s .15s,transform .7s .15s}
+.rv2.on{opacity:1;transform:translateY(0)}
+
+@keyframes up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:900px){
+  nav{padding:1rem 1.5rem}.nav-links{display:none}
+  .hero-inner{grid-template-columns:1fr;gap:3rem}
+  .hero-right{display:none}
+  #hero,.sect{padding-left:1.5rem;padding-right:1.5rem}
+  .tools{grid-template-columns:1fr}
+  .arch-grid{grid-template-columns:1fr}.stack{position:static}
+  .pipeline{grid-template-columns:1fr 1fr}
+  footer{flex-direction:column;gap:1.5rem;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+<div id="c"></div><div id="cr"></div>
+<canvas id="bg"></canvas>
+
+<nav>
+  <div class="logo">ArXiv MCP <sub>v2 · vectorless</sub></div>
+  <ul class="nav-links">
+    <li><a href="#tools">Tools</a></li>
+    <li><a href="#arch">Architecture</a></li>
+    <li><a href="#install">Install</a></li>
+  </ul>
+  <a href="https://github.com/yourusername/arxiv-mcp-server" class="nav-cta" target="_blank">GitHub ↗</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="h-tag">MCP Server &nbsp;·&nbsp; Open Source &nbsp;·&nbsp; Python</div>
+      <h1>Research<br><span class="h1-i">intelligence</span><br><span class="h1-d">for Claude</span></h1>
+      <p class="hero-copy">
+        An MCP server that gives Claude <span>semantic paper search</span>,
+        full <span>RAG over your library</span>, and a novel
+        <span>vectorless retrieval pipeline</span> — no embeddings, no GPU.
+      </p>
+      <div class="ctas">
+        <a href="#install" class="btn btn-g">Get started</a>
+        <a href="https://github.com/yourusername/arxiv-mcp-server" class="btn btn-o" target="_blank">View source →</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="term">
+        <div class="term-top">
+          <div class="dot d1"></div><div class="dot d2"></div><div class="dot d3"></div>
+          <span class="term-label">Claude Desktop — live tool call</span>
+        </div>
+        <div class="term-body" id="tb">
+          <div><span class="tp">you › </span><span id="tl"></span></div>
+          <div id="tout" style="margin-top:.5rem"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="rule"><div class="rule-txt">6 MCP tools · BM25 + RRF · contextual compression · zero embeddings</div></div>
+
+<!-- TOOLS -->
+<section id="tools" class="sect">
+  <div class="rv">
+    <div class="sect-eye">MCP Tools</div>
+    <div class="sect-h">Six tools.<br><span class="sect-hi">One research assistant.</span></div>
+  </div>
+  <div class="tools rv2">
+    <div class="tool"><span class="t-n">01</span><div class="t-name">search_papers</div><div class="t-sig">query, max_results?, category?</div><p class="t-desc">Live ArXiv semantic search. Returns ranked results with titles, authors, abstracts, categories, and PDF links.</p></div>
+    <div class="tool"><span class="t-n">02</span><div class="t-name">fetch_paper</div><div class="t-sig">arxiv_id, add_to_reading_list?</div><p class="t-desc">Downloads the full PDF, extracts text, chunks at 500 words with overlap, and indexes into the BM25 store. No embedding step.</p></div>
+    <div class="tool"><span class="t-n">03</span><div class="t-name">query_library</div><div class="t-sig">question, top_k?, use_expansion?</div><p class="t-desc">Full vectorless RAG: query expansion → multi-query BM25 → RRF fusion → sentence-level compression → cited context.</p></div>
+    <div class="tool"><span class="t-n">04</span><div class="t-name">summarize_paper</div><div class="t-sig">arxiv_id</div><p class="t-desc">Pulls intro + methods + conclusion chunks and asks Claude for a structured summary: problem, contribution, results, limitations.</p></div>
+    <div class="tool"><span class="t-n">05</span><div class="t-name">list_library</div><div class="t-sig">—</div><p class="t-desc">Returns all papers indexed in your local BM25 store with titles, authors, categories, and index dates.</p></div>
+    <div class="tool"><span class="t-n">06</span><div class="t-name">get_reading_list</div><div class="t-sig">—</div><p class="t-desc">Your saved reading list: metadata, timestamps, read/unread status, personal notes — persisted to JSON.</p></div>
+  </div>
+</section>
+
+<!-- ARCH -->
+<section id="arch" class="sect" style="padding-top:0">
+  <div class="rv">
+    <div class="sect-eye">Architecture</div>
+    <div class="sect-h">How it works</div>
+  </div>
+
+  <!-- Vectorless callout -->
+  <div class="vless-box rv">
+    <div class="vless-tag">New in v2</div>
+    <div class="vless-title">Vectorless RAG</div>
+    <p class="vless-copy">
+      Traditional RAG embeds every chunk with a neural model and retrieves by cosine similarity.
+      Vectorless RAG replaces the embedding step with <strong>BM25 keyword retrieval</strong> —
+      the same algorithm that powers Elasticsearch and academic search engines.
+      It excels at exact technical terms like <strong>LoRA, RLHF, KV-cache</strong> that dense vectors often miss.
+      Multi-query results are fused with <strong>Reciprocal Rank Fusion (RRF)</strong>,
+      then each retrieved chunk is compressed to only the relevant sentences by a sentence-level BM25 pass.
+    </p>
+    <div class="pipeline">
+      <div class="pipe-step"><div class="ps-n">step 01</div><div class="ps-name">Query expansion</div><div class="ps-desc">LLM rewrites query into 3 keyword variants to maximize BM25 recall</div></div>
+      <div class="pipe-step"><div class="ps-n">step 02</div><div class="ps-name">Multi-query BM25</div><div class="ps-desc">Okapi BM25 scores all chunks for each variant independently</div></div>
+      <div class="pipe-step"><div class="ps-n">step 03</div><div class="ps-name">RRF fusion</div><div class="ps-desc">Reciprocal Rank Fusion combines 3 ranked lists into one without score normalization</div></div>
+      <div class="pipe-step"><div class="ps-n">step 04</div><div class="ps-name">Contextual compression</div><div class="ps-desc">Sentence-level BM25 extracts only the 2–3 sentences from each chunk that answer the question</div></div>
+    </div>
+  </div>
+
+  <div class="arch-grid rv2">
+    <div class="steps">
+      <div class="step"><span class="s-n">01 —</span><div><div class="s-title">Claude calls a tool</div><p class="s-desc">Claude Desktop connects over stdio via the MCP protocol. Research questions are routed to the appropriate tool as structured JSON.</p></div></div>
+      <div class="step"><span class="s-n">02 —</span><div><div class="s-title">ArXiv API + PDF extraction</div><p class="s-desc">Live search hits the ArXiv REST API. Fetch downloads PDFs via httpx and uses pdfplumber to extract clean text, capped at 40 pages.</p></div></div>
+      <div class="step"><span class="s-n">03 —</span><div><div class="s-title">Chunking → BM25 index</div><p class="s-desc">Text is split into 500-word chunks with 50-word overlap. Each chunk is added to the Okapi BM25 index immediately — no encode() call, no model load.</p></div></div>
+      <div class="step"><span class="s-n">04 —</span><div><div class="s-title">Multi-query retrieval + RRF</div><p class="s-desc">Three query variants are BM25-searched independently. RRF score = Σ 1/(k + rank). The top-2k fused results go to the compression step.</p></div></div>
+      <div class="step"><span class="s-n">05 —</span><div><div class="s-title">Cited context returned to Claude</div><p class="s-desc">Compressed chunks are formatted as [Source N] citations and returned as structured JSON. Claude generates a grounded, cited answer.</p></div></div>
+    </div>
+    <div class="stack">
+      <div class="st-label">Tech stack</div>
+      <div class="si"><div class="sdot" style="background:var(--gold)"></div>mcp<span class="stag">protocol</span></div>
+      <div class="si"><div class="sdot" style="background:var(--gold)"></div>arxiv<span class="stag">data source</span></div>
+      <div class="si"><div class="sdot" style="background:var(--ice)"></div>BM25 (built-in)<span class="stag">retrieval</span></div>
+      <div class="si"><div class="sdot" style="background:var(--ice)"></div>RRF fusion<span class="stag">ranking</span></div>
+      <div class="si"><div class="sdot" style="background:var(--ice)"></div>sentence BM25<span class="stag">compression</span></div>
+      <div class="si"><div class="sdot" style="background:#a0c4a0"></div>pdfplumber<span class="stag">extraction</span></div>
+      <div class="si"><div class="sdot" style="background:#888"></div>httpx<span class="stag">async http</span></div>
+      <div class="si"><div class="sdot" style="background:#888"></div>json<span class="stag">persistence</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- INSTALL -->
+<section id="install" class="sect" style="padding-top:0">
+  <div class="rv">
+    <div class="sect-eye">Quick start</div>
+    <div class="sect-h">Running in <span class="sect-hi">four steps</span></div>
+  </div>
+  <div class="install rv2">
+    <div class="ist">
+      <div class="i-n">1</div>
+      <div>
+        <div class="i-title">Clone the repo</div>
+        <div class="i-code">git clone https://github.com/yourusername/arxiv-mcp-server
+cd arxiv-mcp-server</div>
+      </div>
+    </div>
+    <div class="ist">
+      <div class="i-n">2</div>
+      <div>
+        <div class="i-title">Create a virtualenv and install</div>
+        <div class="i-code">python -m venv .venv && source .venv/bin/activate
+pip install -e .</div>
+        <div class="i-note">No GPU required. No model download. Dependencies install in under 30 seconds.</div>
+      </div>
+    </div>
+    <div class="ist">
+      <div class="i-n">3</div>
+      <div>
+        <div class="i-title">Add to Claude Desktop config</div>
+        <div class="i-code">{
+  "mcpServers": {
+    "arxiv-research": {
+      "command": "python",
+      "args": ["-m", "src.server"],
+      "cwd": "/path/to/arxiv-mcp-server"
+    }
+  }
+}</div>
+        <div class="i-note">Config lives at ~/Library/Application Support/Claude/claude_desktop_config.json on macOS</div>
+      </div>
+    </div>
+    <div class="ist">
+      <div class="i-n">4</div>
+      <div>
+        <div class="i-title">Restart Claude Desktop and start researching</div>
+        <div class="i-code">"Search for papers on speculative decoding"
+"Fetch paper 2305.10601 and index it"
+"What does my library say about KV cache optimization?"</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="f-logo">ArXiv MCP</div>
+  <div class="f-links">
+    <a href="https://github.com/yourusername/arxiv-mcp-server" target="_blank">GitHub</a>
+    <a href="https://modelcontextprotocol.io" target="_blank">MCP Docs</a>
+    <a href="https://arxiv.org" target="_blank">ArXiv</a>
+    <a href="#install">Install</a>
+  </div>
+  <div class="f-copy">MIT License · Built with Python</div>
+</footer>
+
+<script>
+// ── Cursor ──────────────────────────────────────────────────────────
+const cur=document.getElementById('c'),ring=document.getElementById('cr');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.cssText=`left:${mx}px;top:${my}px`});
+(function tick(){rx+=(mx-rx)*.1;ry+=(my-ry)*.1;ring.style.cssText=`left:${rx}px;top:${ry}px`;requestAnimationFrame(tick)})();
+
+// ── Canvas — refined particle field ────────────────────────────────
+const cv=document.getElementById('bg'),ctx=cv.getContext('2d');
+let W,H,pts=[];
+const resize=()=>{W=cv.width=innerWidth;H=cv.height=innerHeight};
+resize();addEventListener('resize',resize);
+for(let i=0;i<60;i++) pts.push({
+  x:Math.random()*W,y:Math.random()*H,
+  vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,
+  r:Math.random()*.8+.3,
+  p:Math.random()*Math.PI*2,s:Math.random()*.008+.003
+});
+function drawBg(ts){
+  ctx.clearRect(0,0,W,H);
+  const t=ts*.001;
+  for(const n of pts){
+    n.x+=n.vx;n.y+=n.vy;
+    if(n.x<0||n.x>W)n.vx*=-1;
+    if(n.y<0||n.y>H)n.vy*=-1;
+    n.p+=n.s;
+  }
+  // Edges
+  for(let i=0;i<pts.length;i++) for(let j=i+1;j<pts.length;j++){
+    const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.hypot(dx,dy);
+    if(d<140){
+      const a=(1-d/140)*.08;
+      ctx.strokeStyle=`rgba(201,169,110,${a})`;
+      ctx.lineWidth=.5;
+      ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke();
+    }
+  }
+  // Nodes
+  for(const n of pts){
+    const a=.15+((Math.sin(n.p)+1)*.5)*.2;
+    ctx.fillStyle=`rgba(201,169,110,${a})`;
+    ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,Math.PI*2);ctx.fill();
+  }
+  requestAnimationFrame(drawBg);
+}
+requestAnimationFrame(drawBg);
+
+// ── Scroll reveal ───────────────────────────────────────────────────
+const obs=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){e.target.classList.add('on');obs.unobserve(e.target)}
+}),{threshold:.1});
+document.querySelectorAll('.rv,.rv2').forEach(el=>obs.observe(el));
+
+// ── Typewriter terminal ─────────────────────────────────────────────
+const lines=[
+  {p:'you › ',t:'Find me recent papers on speculative decoding'},null,
+  {o:'[search_papers] querying arxiv...'},
+  {o:'→ "Draft & Verify: LLM Acceleration via Speculative..." 2024'},
+  {o:'→ "SpecInfer: Accelerating LLM Serving..." 2024'},
+  {o:''},
+  {p:'you › ',t:'Fetch paper 2402.03545'},null,
+  {o:'[fetch_paper] downloading pdf · extracting 28 pages...'},
+  {o:'[bm25] indexing 312 chunks · no embeddings used'},
+  {ok:'✓ indexed. query your library with query_library.'},
+];
+const tl=document.getElementById('tl'),tout=document.getElementById('tout');
+let li=0,ci=0,ols=[];
+function tick(){
+  if(li>=lines.length){setTimeout(()=>{li=0;ci=0;ols=[];tout.innerHTML='';tl.textContent='';tick()},3500);return}
+  const l=lines[li];
+  if(!l){li++;setTimeout(tick,250);return}
+  if(l.p){
+    if(ci<l.t.length){
+      tl.innerHTML=`<span class="tp">${l.p}</span><span class="tc">${l.t.slice(0,++ci)}</span><span class="tcr"></span>`;
+      setTimeout(tick,28+Math.random()*28);
+    }else{
+      tl.innerHTML=`<span class="tp">${l.p}</span><span class="tc">${l.t}</span>`;
+      li++;ci=0;setTimeout(tick,380);
+    }
+  }else{
+    const txt=l.ok||l.o;
+    ols.push({txt,ok:!!l.ok});
+    tout.innerHTML=ols.map(x=>`<div class="${x.ok?'tok':'to'}">${x.txt}</div>`).join('');
+    if(!txt){tl.textContent='';li++;ci=0}
+    li++;setTimeout(tick,160);
+  }
+}
+setTimeout(tick,1600);
+</script>
+</body>
+</html>
