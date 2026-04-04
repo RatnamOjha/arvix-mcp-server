@@ -7,7 +7,7 @@ import asyncio
 import json
 import tempfile
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
@@ -116,11 +116,9 @@ class TestReadingList:
 # ── Embedder (mocked) ─────────────────────────────────────────────────────────
 
 class TestEmbedder:
-    @patch("src.embedder.SentenceTransformer" if False else "builtins.__import__")
     def test_encode_shape(self):
         """Test that encode returns correct shape."""
         embedder = Embedder()
-        # Mock the internal model
         mock_model = MagicMock()
         mock_model.encode.return_value = np.random.rand(3, 384).astype(np.float32)
         embedder._model = mock_model

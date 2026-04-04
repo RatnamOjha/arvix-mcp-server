@@ -38,7 +38,6 @@ import re
 import string
 from collections import Counter, defaultdict
 from pathlib import Path
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 

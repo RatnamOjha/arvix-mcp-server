@@ -1,7 +1,16 @@
-import asyncio, logging, re, tempfile
+"""
+ArXiv API client — search and fetch paper metadata + PDFs.
+"""
+import asyncio
+import logging
+import re
+import tempfile
 from pathlib import Path
 from typing import Optional
-import arxiv, httpx, pdfplumber
+
+import arxiv
+import httpx
+import pdfplumber
 
 logger = logging.getLogger(__name__)
 
@@ -40,20 +49,17 @@ class ArxivClient:
             return results[0]
         paper = await loop.run_in_executor(None, _get_meta)
         metadata = {
-            "arxiv_id": arxiv_id,
-            "title": paper.title,
+            "arxiv_id": arxiv_id, "title": paper.title,
             "authors": [a.name for a in paper.authors[:5]],
             "abstract": paper.summary,
             "published": paper.published.isoformat() if paper.published else None,
-            "categories": paper.categories,
-            "pdf_url": paper.pdf_url,
+            "categories": paper.categories, "pdf_url": paper.pdf_url,
         }
         text = await self._extract_pdf_text(paper.pdf_url)
         chunks = self._chunk_text(text)
         rag.add_paper(arxiv_id=arxiv_id, chunks=chunks, metadata=metadata)
         return {
-            "metadata": metadata,
-            "chunks_indexed": len(chunks),
+            "metadata": metadata, "chunks_indexed": len(chunks),
             "retrieval_method": "vectorless (BM25 + RRF)",
             "status": "success",
             "message": f"'{paper.title}' indexed with {len(chunks)} chunks. No embeddings used.",
