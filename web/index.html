@@ -292,6 +292,7 @@ footer{
   <div class="logo">ArXiv MCP <sub>v2 · vectorless</sub></div>
   <ul class="nav-links">
     <li><a href="#tools">Tools</a></li>
+    <li><a href="#nopro">No Pro?</a></li>
     <li><a href="#arch">Architecture</a></li>
     <li><a href="#install">Install</a></li>
   </ul>
@@ -407,7 +408,7 @@ footer{
       <div class="i-n">1</div>
       <div>
         <div class="i-title">Clone the repo</div>
-        <div class="i-code">git clone https://github.com/yourusername/arxiv-mcp-server
+        <div class="i-code">git clone https://github.com/YOUR_USERNAME/arxiv-mcp-server
 cd arxiv-mcp-server</div>
       </div>
     </div>
@@ -427,13 +428,13 @@ pip install -e .</div>
         <div class="i-code">{
   "mcpServers": {
     "arxiv-research": {
-      "command": "python",
+      "command": "/absolute/path/to/.venv/bin/python",
       "args": ["-m", "src.server"],
-      "cwd": "/path/to/arxiv-mcp-server"
+      "cwd": "/absolute/path/to/arxiv-mcp-server"
     }
   }
 }</div>
-        <div class="i-note">Config lives at ~/Library/Application Support/Claude/claude_desktop_config.json on macOS</div>
+        <div class="i-note">Config at ~/Library/Application Support/Claude/claude_desktop_config.json on macOS. Use the full .venv/bin/python path — avoids Anaconda conflicts.</div>
       </div>
     </div>
     <div class="ist">
@@ -448,10 +449,61 @@ pip install -e .</div>
   </div>
 </section>
 
+<!-- NO PRO SECTION -->
+<section id="nopro" class="sect" style="padding-top:0">
+  <div class="rv">
+    <div class="sect-eye">No Claude Pro required</div>
+    <div class="sect-h">Use the full pipeline<br><span class="sect-hi">from your terminal</span></div>
+  </div>
+  <div class="vless-box rv" style="margin-top:0">
+    <div class="vless-tag">Works on free plan</div>
+    <div class="vless-title">test_local.py</div>
+    <p class="vless-copy">
+      Claude Pro is only needed for the <strong>Claude Desktop chat interface</strong>. The entire ML pipeline —
+      ArXiv search, PDF download, BM25 indexing, RAG queries, reading list — runs directly from your terminal
+      with no subscription required. Use <strong>test_local.py</strong> included in the repo.
+    </p>
+  </div>
+  <div class="install rv2" style="margin-top:1px">
+    <div class="ist">
+      <div class="i-n">→</div>
+      <div>
+        <div class="i-title">Search ArXiv live</div>
+        <div class="i-code">python test_local.py --search</div>
+        <div class="i-note">Queries the live ArXiv API and returns ranked paper results with titles, authors, and IDs.</div>
+      </div>
+    </div>
+    <div class="ist">
+      <div class="i-n">→</div>
+      <div>
+        <div class="i-title">Fetch and index a paper</div>
+        <div class="i-code">python test_local.py --fetch --arxiv-id 2005.11401</div>
+        <div class="i-note">Downloads the PDF, extracts text, chunks it, builds the BM25 index. No embeddings. ~15 seconds.</div>
+      </div>
+    </div>
+    <div class="ist">
+      <div class="i-n">→</div>
+      <div>
+        <div class="i-title">Query your library with RAG</div>
+        <div class="i-code">python test_local.py --query --question "what retrieval method does RAG use?"</div>
+        <div class="i-note">Full vectorless RAG pipeline: query expansion → BM25 → RRF fusion → contextual compression → cited answer.</div>
+      </div>
+    </div>
+    <div class="ist">
+      <div class="i-n">→</div>
+      <div>
+        <div class="i-title">Run everything at once</div>
+        <div class="i-code">python test_local.py</div>
+        <div class="i-note">Runs search, fetch, query, and library listing in sequence. Great for a first end-to-end demo.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <footer>
   <div class="f-logo">ArXiv MCP</div>
   <div class="f-links">
-    <a href="https://github.com/yourusername/arxiv-mcp-server" target="_blank">GitHub</a>
+    <a href="https://github.com/RatnamOjha/arvix-mcp-server" target="_blank">GitHub</a>
     <a href="https://modelcontextprotocol.io" target="_blank">MCP Docs</a>
     <a href="https://arxiv.org" target="_blank">ArXiv</a>
     <a href="#install">Install</a>

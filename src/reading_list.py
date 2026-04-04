@@ -16,6 +16,7 @@ READING_LIST_FILE = "reading_list.json"
 
 class ReadingList:
     def __init__(self, data_dir: Path):
+        data_dir.mkdir(parents=True, exist_ok=True)
         self.path = data_dir / READING_LIST_FILE
         self._data: dict[str, dict] = {}
         self._load()

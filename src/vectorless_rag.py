@@ -147,6 +147,7 @@ class VectorlessRAG:
 
     def __init__(self, data_dir: Path):
         self.data_dir = data_dir
+        self.data_dir.mkdir(parents=True, exist_ok=True)  # always safe to call
         self.index_path = data_dir / "bm25_index.json"
 
         # Per-paper storage
