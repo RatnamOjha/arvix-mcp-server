@@ -113,7 +113,7 @@ class BM25:
         return scores[:top_k]
 
 
-# Reciprocal Rank Fusion 
+# ── Reciprocal Rank Fusion ─────────────────────────────────────────────────────
 
 def reciprocal_rank_fusion(
     ranked_lists: list[list[tuple[int, float]]],
@@ -134,7 +134,7 @@ def reciprocal_rank_fusion(
     return sorted(rrf_scores.items(), key=lambda x: x[1], reverse=True)
 
 
-# Vectorless RAG Engine
+# ── Vectorless RAG Engine ──────────────────────────────────────────────────────
 
 class VectorlessRAG:
     """
@@ -160,7 +160,7 @@ class VectorlessRAG:
 
         self._load()
 
-    # Indexing
+    # ── Indexing ───────────────────────────────────────────────────────────────
 
     def add_paper(self, arxiv_id: str, chunks: list[str], metadata: dict) -> None:
         """Index a paper. Idempotent."""
@@ -192,29 +192,43 @@ class VectorlessRAG:
             self.bm25.index(self.chunks)
             self._indexed = True
 
-    # Query Pipeline
+    # ── Query Pipeline ─────────────────────────────────────────────────────────
 
     async def query(
         self,
         question: str,
         top_k: int = 6,
         use_query_expansion: bool = True,
+        arxiv_id_filter: str = None,
     ) -> dict:
         """
         Full vectorless RAG pipeline.
-        
-        Steps:
-          1. (Optional) Expand query into 3 keyword variants
-          2. BM25 search for each variant
-          3. RRF fusion of ranked lists
-          4. Contextual compression of top chunks
-          5. Return cited context dict
+
+        Args:
+            question:           Natural language question
+            top_k:              Number of chunks to retrieve
+            use_query_expansion: Generate keyword variants for better recall
+            arxiv_id_filter:    If set, restrict search to this paper only
         """
         if not self._indexed or not self.chunks:
             return {
                 "answer": "Library is empty. Use fetch_paper to index papers first.",
                 "sources": [],
             }
+
+        # Apply paper filter — restrict chunks to one paper if requested
+        if arxiv_id_filter:
+            if arxiv_id_filter not in self.papers:
+                return {
+                    "answer": f"Paper {arxiv_id_filter} is not in your library. Fetch it first.",
+                    "sources": [],
+                }
+            active_indices = [
+                i for i, m in enumerate(self.chunk_meta)
+                if m["arxiv_id"] == arxiv_id_filter
+            ]
+        else:
+            active_indices = list(range(len(self.chunks)))
 
         # Step 1 — Query expansion
         queries = [question]
@@ -223,11 +237,13 @@ class VectorlessRAG:
             queries = [question] + expanded
             logger.info(f"Expanded to {len(queries)} queries: {queries}")
 
-        # Step 2 — BM25 per query
+        # Step 2 — BM25 per query (over filtered subset)
         ranked_lists = []
         for q in queries:
-            results = self.bm25.search(q, top_k=top_k * 3)
-            ranked_lists.append(results)
+            all_results = self.bm25.search(q, top_k=len(active_indices))
+            # Keep only chunks belonging to active_indices
+            filtered = [(i, s) for i, s in all_results if i in set(active_indices)]
+            ranked_lists.append(filtered[:top_k * 3])
 
         # Step 3 — RRF fusion
         fused = reciprocal_rank_fusion(ranked_lists)
@@ -371,7 +387,7 @@ Output:"""
         sentences = re.split(r'(?<=[.!?])\s+', text.strip())
         return [s for s in sentences if len(s) > 20]
 
-    # Persistence
+    # ── Persistence ────────────────────────────────────────────────────────────
 
     def _save(self) -> None:
         payload = {
@@ -394,7 +410,7 @@ Output:"""
                 self._rebuild_index()
             logger.info(f"Loaded vectorless index: {len(self.chunks)} chunks")
 
-    # Helpers
+    # ── Helpers ────────────────────────────────────────────────────────────────
 
     def list_papers(self) -> list[dict]:
         return list(self.papers.values())

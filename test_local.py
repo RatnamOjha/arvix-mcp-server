@@ -81,7 +81,7 @@ async def test_fetch(arxiv_id: str = DEFAULT_PAPER):
     return result
 
 
-async def test_query(question: str = "what retrieval method does RAG use?"):
+async def test_query(question: str = "what retrieval method does RAG use?", paper: str = None):
     header(f"Vectorless RAG Query")
     from src.vectorless_rag import VectorlessRAG
 
@@ -92,8 +92,10 @@ async def test_query(question: str = "what retrieval method does RAG use?"):
         print("    python test_local.py --fetch")
         return
 
+    if paper:
+        info(f"Filtering to paper: {paper}\n")
     print(f"  Question: {question}\n")
-    result = await rag.query(question, top_k=4)
+    result = await rag.query(question, top_k=4, arxiv_id_filter=paper)
 
     ok("Query expanded into BM25 variants:")
     for q in result.get("expanded_queries", []):
@@ -162,6 +164,7 @@ if __name__ == "__main__":
     parser.add_argument("--library", action="store_true", help="Show library contents")
     parser.add_argument("--arxiv-id", default=DEFAULT_PAPER, help="ArXiv ID to fetch")
     parser.add_argument("--question", default="what retrieval method does RAG use?", help="Question to ask")
+    parser.add_argument("--paper", default=None, help="Restrict query to a specific arxiv ID e.g. --paper 2507.07171")
     args = parser.parse_args()
 
     if args.search:
@@ -169,7 +172,7 @@ if __name__ == "__main__":
     elif args.fetch:
         asyncio.run(test_fetch(args.arxiv_id))
     elif args.query:
-        asyncio.run(test_query(args.question))
+        asyncio.run(test_query(args.question, args.paper))
     elif args.library:
         asyncio.run(test_library())
     else:
