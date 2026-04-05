@@ -20,6 +20,11 @@ from typing import Optional
 import arxiv
 import httpx
 import pdfplumber
+try:
+    import fitz  # pymupdf — better for LaTeX/multi-column PDFs
+    HAS_FITZ = True
+except ImportError:
+    HAS_FITZ = False
 
 logger = logging.getLogger(__name__)
 
@@ -164,12 +169,22 @@ class ArxivClient:
 
     async def _extract_pdf_text(self, pdf_url: str, arxiv_id: str) -> str:
         """
-        Download PDF from the direct CDN URL and extract text.
-        ArXiv's PDF CDN has no rate limiting — this always works.
+        Download PDF directly from ArXiv CDN and extract text.
+
+        Extraction strategy:
+          1. Try pymupdf (fitz) first — handles LaTeX fonts, multi-column
+             layouts, and math-heavy papers far better than pdfplumber.
+          2. Fall back to pdfplumber if fitz is not installed.
+          3. If both produce garbled text (common with equation-heavy pages),
+             we clean it: filter out lines that are mostly single characters
+             (the signature of scrambled LaTeX fonts).
         """
         headers = {
-            # Polite user-agent as requested by ArXiv's usage policy
-            "User-Agent": f"arxiv-mcp-server/1.0 (https://github.com/yourusername/arxiv-mcp-server; research tool) arxiv-id/{arxiv_id}"
+            "User-Agent": (
+                f"arxiv-mcp-server/1.0 "
+                f"(https://github.com/yourusername/arxiv-mcp-server; research tool) "
+                f"arxiv-id/{arxiv_id}"
+            )
         }
         async with httpx.AsyncClient(timeout=90.0, follow_redirects=True) as client:
             resp = await client.get(pdf_url, headers=headers)
@@ -185,20 +200,65 @@ class ArxivClient:
             tmp_path = Path(f.name)
 
         try:
-            with pdfplumber.open(tmp_path) as pdf:
-                pages = []
-                for page in pdf.pages[:40]:
-                    text = page.extract_text()
-                    if text and text.strip():
-                        pages.append(text)
-            if not pages:
+            if HAS_FITZ:
+                text = self._extract_with_fitz(tmp_path)
+            else:
+                text = self._extract_with_pdfplumber(tmp_path)
+
+            text = self._clean_extracted_text(text)
+
+            if not text.strip():
                 raise ValueError(
-                    f"Could not extract text from {arxiv_id}. "
-                    f"The PDF may be scanned/image-based. Try a different paper."
+                    f"Could not extract readable text from {arxiv_id}. "
+                    f"The PDF may be scanned or image-based."
                 )
-            return "\n\n".join(pages)
+            return text
         finally:
             tmp_path.unlink(missing_ok=True)
+
+    def _extract_with_fitz(self, path: Path) -> str:
+        """
+        pymupdf extraction — best for LaTeX papers.
+        Uses 'text' mode which reconstructs reading order across columns.
+        """
+        import fitz
+        doc = fitz.open(str(path))
+        pages = []
+        for page in doc[:40]:
+            # "text" flag sorts by reading order, handles multi-column
+            text = page.get_text("text")
+            if text and text.strip():
+                pages.append(text)
+        doc.close()
+        return "\n\n".join(pages)
+
+    def _extract_with_pdfplumber(self, path: Path) -> str:
+        """Fallback extractor using pdfplumber."""
+        with pdfplumber.open(path) as pdf:
+            pages = []
+            for page in pdf.pages[:40]:
+                text = page.extract_text()
+                if text and text.strip():
+                    pages.append(text)
+        return "\n\n".join(pages)
+
+    def _clean_extracted_text(self, text: str) -> str:
+        """
+        Remove lines that are garbled — the signature of scrambled LaTeX fonts
+        is lines where most tokens are single characters with spaces between them
+        e.g. 'b e a h A b r ξ o a s α v t'
+        We keep lines where the average token length is > 2 characters.
+        """
+        cleaned = []
+        for line in text.split("\n"):
+            tokens = line.split()
+            if not tokens:
+                cleaned.append(line)
+                continue
+            avg_len = sum(len(t) for t in tokens) / len(tokens)
+            if avg_len > 1.8:   # real words average > 1.8 chars
+                cleaned.append(line)
+        return "\n".join(cleaned)
 
     # ── Chunking ──────────────────────────────────────────────────────────────
 

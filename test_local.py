@@ -81,7 +81,7 @@ async def test_fetch(arxiv_id: str = DEFAULT_PAPER):
     return result
 
 
-async def test_query(question: str = "what retrieval method does RAG use?", paper: str = None):
+async def test_query(question: str = "what retrieval method does RAG use?", paper: str = None, full: bool = False):
     header(f"Vectorless RAG Query")
     from src.vectorless_rag import VectorlessRAG
 
@@ -109,11 +109,11 @@ async def test_query(question: str = "what retrieval method does RAG use?", pape
 
     print()
     ok("Compressed context (what Claude would receive):")
-    ctx = result["context"][:600]
+    ctx = result["context"] if full else result["context"][:600]
     for line in ctx.split("\n"):
         info(line)
-    if len(result["context"]) > 600:
-        info("  ... (truncated)")
+    if not full and len(result["context"]) > 600:
+        info("  ... (truncated — run with --full to see everything)")
 
     print()
     ok(f"Retrieval method: {result['retrieval_method']}")
@@ -165,6 +165,7 @@ if __name__ == "__main__":
     parser.add_argument("--arxiv-id", default=DEFAULT_PAPER, help="ArXiv ID to fetch")
     parser.add_argument("--question", default="what retrieval method does RAG use?", help="Question to ask")
     parser.add_argument("--paper", default=None, help="Restrict query to a specific arxiv ID e.g. --paper 2507.07171")
+    parser.add_argument("--full", action="store_true", help="Show full untruncated context output")
     args = parser.parse_args()
 
     if args.search:
@@ -172,7 +173,7 @@ if __name__ == "__main__":
     elif args.fetch:
         asyncio.run(test_fetch(args.arxiv_id))
     elif args.query:
-        asyncio.run(test_query(args.question, args.paper))
+        asyncio.run(test_query(args.question, args.paper, args.full))
     elif args.library:
         asyncio.run(test_library())
     else:

@@ -1,6 +1,6 @@
 # ArXiv Research Intelligence — MCP Server
 
-> Semantic paper search, vectorless RAG, and BM25 retrieval over ArXiv — as an MCP server for Claude.
+> Vectorless RAG over ArXiv — BM25 + RRF + contextual compression — as an MCP server for Claude.
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/)
 [![MCP](https://img.shields.io/badge/protocol-MCP-purple.svg)](https://modelcontextprotocol.io)
@@ -8,9 +8,42 @@
 
 ---
 
-## What changed in v2 — Vectorless RAG
+## What this is
 
-The original version used `sentence-transformers` to embed every chunk into a 384-dimensional vector, then retrieved by cosine similarity. **v2 replaces this entirely** with a vectorless pipeline:
+An MCP server that gives Claude live tools to search ArXiv, download and index full papers, and answer research questions from your personal paper library — all without embeddings, GPU, or model downloads.
+
+---
+
+## Vectorless RAG — why and how
+
+Most RAG pipelines embed every text chunk with a neural model, store vectors, and retrieve by cosine similarity. This works but has real costs: GPU or slow CPU inference, ~90MB model downloads, embedding drift, and poor handling of exact technical terms like `LoRA`, `RLHF`, `KV-cache`.
+
+**v2 replaces the embedding step entirely with Okapi BM25** — the same algorithm that powers Elasticsearch and academic search engines. Zero model downloads, instant indexing, and it handles exact terminology perfectly.
+
+### The full pipeline
+
+```
+Your question
+     │
+     ▼
+Query expansion ── generates keyword variants to maximize BM25 recall
+     │
+     ▼
+Multi-query BM25 ── each variant scored against all chunks independently
+     │
+     ▼
+RRF fusion ── Reciprocal Rank Fusion merges ranked lists
+              score = Σ 1/(60 + rank) — no score normalization needed
+     │
+     ▼
+Contextual compression ── sentence-level BM25 extracts only the 2–3
+                          sentences per chunk that answer the question
+     │
+     ▼
+Cited context returned to Claude
+```
+
+### v1 vs v2 comparison
 
 | | v1 (vector RAG) | v2 (vectorless RAG) |
 |---|---|---|
@@ -20,127 +53,81 @@ The original version used `sentence-transformers` to embed every chunk into a 38
 | Compression | cross-encoder reranker | sentence-level BM25 |
 | GPU required | yes (or slow CPU) | no |
 | Model download | ~90MB on first run | none |
-| Handles exact terms (LoRA, RLHF) | sometimes misses | always catches |
-
-### How vectorless RAG works
-
-```
-Your question
-     │
-     ▼
-Query expansion ── LLM rewrites into 3 keyword variants
-     │
-     ▼
-BM25 retrieval ── each variant scored against all chunks independently
-     │
-     ▼
-RRF fusion ── Reciprocal Rank Fusion combines 3 ranked lists
-              score = Σ 1/(60 + rank)  — robust, no score normalization needed
-     │
-     ▼
-Contextual compression ── sentence-level BM25 extracts only the
-                          2-3 sentences per chunk that answer the question
-     │
-     ▼
-Cited context returned to Claude
-```
+| Exact terms (LoRA, RLHF) | sometimes misses | always catches |
 
 ---
 
 ## No Claude Pro? No problem
 
-You can use the full pipeline — search, fetch, index, and query — directly from your terminal without Claude Desktop at all.
+The entire ML pipeline runs from your terminal with `test_local.py`. Claude Pro is only needed for the Claude Desktop chat interface.
 
-### Run tests locally
+### Setup
 
 ```bash
-# Clone and install
-git clone https://github.com/RatnamOjha/arxiv-mcp-server
-cd arxiv-mcp-server
+git clone https://github.com/RatnamOjha/arvix-mcp-server
+cd arvix-mcp-server
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e .
-
-# Run the full test suite (no Claude needed)
-python test_local.py
-
-# Or test individual parts
-python test_local.py --search                        # live ArXiv search
-python test_local.py --fetch --arxiv-id 2005.11401  # fetch the RAG paper
-python test_local.py --query --question "what is BM25?"
-python test_local.py --library                       # see what's indexed
 ```
 
-What `test_local.py` shows you:
-- **Search** — live ArXiv results for any query
-- **Fetch** — PDF download → text extraction → BM25 indexing (no embeddings)
-- **Query** — expanded queries, RRF-fused sources, compressed context
-- **Library** — all indexed papers and your reading list
+### Run tests
 
-Everything persists between runs at `~/.arxiv-mcp/`.
+```bash
+python3 test_local.py                          # full end-to-end demo
+python3 test_local.py --search                 # live ArXiv search
+python3 test_local.py --fetch --arxiv-id 2005.11401   # fetch a paper
+python3 test_local.py --query --question "what is BM25?"
+python3 test_local.py --library                # see what's indexed
+```
 
 ---
 
 ## Test with your own paper
 
-Have a specific ArXiv paper you want to try? Here's all you need.
+### Step 1 — Find your paper ID
 
-**Step 1 — Find your paper ID**
-
-The ID is the number at the end of any ArXiv URL:
 ```
 https://arxiv.org/abs/2301.07041
                    ^^^^^^^^^^^^^ this is your paper ID
 ```
 
-**Step 2 — Fetch and index it**
+### Step 2 — Fetch and index it
 
 ```bash
-python test_local.py --fetch --arxiv-id 2301.07041
+python3 test_local.py --fetch --arxiv-id 2301.07041
 ```
 
-This downloads the full PDF, extracts the text, and builds the BM25 index.
-Takes about 10–20 seconds depending on paper length.
+Downloads the PDF directly (no API, no rate limiting), extracts text using pymupdf, chunks and indexes into BM25.
 
-**Step 3 — Ask questions about it**
+### Step 3 — Query it
 
 ```bash
-python test_local.py --query --question "what is the main contribution of this paper?"
-python test_local.py --query --question "what datasets did they evaluate on?"
-python test_local.py --query --question "what are the limitations?"
+# Query the whole library
+python3 test_local.py --query --question "what problem does this paper solve?"
+
+# Query one specific paper only
+python3 test_local.py --query --paper 2301.07041 --question "what are the limitations?"
+
+# See full untruncated output
+python3 test_local.py --query --paper 2301.07041 --question "what methods do they use?" --full
 ```
 
-**Step 4 — Check your library**
+### Step 4 — Build a multi-paper library
 
 ```bash
-python test_local.py --library
+python3 test_local.py --fetch --arxiv-id 2301.07041
+python3 test_local.py --fetch --arxiv-id 2305.10601
+python3 test_local.py --fetch --arxiv-id 2005.11401
+
+# Cross-paper query
+python3 test_local.py --query --question "how do these papers approach retrieval differently?"
 ```
 
-Shows all papers indexed so far. Everything persists between runs —
-build up a library over time and query across all of them at once.
-
-**Fetch multiple papers and query across all of them:**
-
-```bash
-python test_local.py --fetch --arxiv-id 2301.07041
-python test_local.py --fetch --arxiv-id 2305.10601
-python test_local.py --fetch --arxiv-id 2005.11401
-
-# Ask a question that spans all three
-python test_local.py --query --question "how do these papers approach retrieval differently?"
-```
+Everything persists at `~/.arxiv-mcp/` between runs.
 
 ---
 
 ## With Claude Pro — MCP integration
-
-### Install
-
-```bash
-git clone https://github.com/RatnamOjha/arxiv-mcp-server
-cd arxiv-mcp-server
-python3 -m venv .venv && source .venv/bin/activate
-pip install -e .
-```
 
 ### Configure Claude Desktop
 
@@ -152,15 +139,15 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
     "arxiv-research": {
       "command": "/absolute/path/to/.venv/bin/python",
       "args": ["-m", "src.server"],
-      "cwd": "/absolute/path/to/arxiv-mcp-server"
+      "cwd": "/absolute/path/to/arvix-mcp-server"
     }
   }
 }
 ```
 
-> Use the full absolute path to your `.venv` Python to avoid conflicts with Anaconda or system Python.
+> Use the **full absolute path** to your `.venv` Python — avoids conflicts with Anaconda or system Python.
 
-Restart Claude Desktop. The 🔨 hammer icon will show 6 new tools.
+Restart Claude Desktop (Cmd+Q, then reopen). The 🔨 hammer icon will show 6 new tools.
 
 ### Example prompts
 
@@ -168,6 +155,7 @@ Restart Claude Desktop. The 🔨 hammer icon will show 6 new tools.
 Search for recent papers on speculative decoding
 Fetch paper 2305.10601 and add it to my library
 What does my library say about KV cache optimization?
+What does paper 2507.07171 say about the evaluation? (uses arxiv_id_filter automatically)
 Summarize paper 2305.10601
 Show me my reading list
 ```
@@ -180,10 +168,47 @@ Show me my reading list
 |------|------|-------------|
 | `search_papers` | `query`, `max_results?`, `category?` | Live ArXiv search |
 | `fetch_paper` | `arxiv_id`, `add_to_reading_list?` | Download + BM25 index |
-| `query_library` | `question`, `top_k?`, `use_expansion?` | Vectorless RAG query |
+| `query_library` | `question`, `top_k?`, `use_expansion?`, `arxiv_id_filter?` | Vectorless RAG query |
 | `summarize_paper` | `arxiv_id` | Structured paper summary |
 | `list_library` | — | All indexed papers |
 | `get_reading_list` | — | Saved reading list |
+
+The `arxiv_id_filter` parameter on `query_library` restricts search to one specific paper — Claude uses this automatically when you mention a paper ID in your question.
+
+---
+
+## Known edge cases and how they're handled
+
+### ArXiv API rate limiting (HTTP 429)
+The API allows ~1 request/3 seconds. If you run multiple searches quickly you'll hit a 429.
+
+**Fix:** PDF download never rate-limits — we go directly to `https://arxiv.org/pdf/{id}` which is a CDN with no limit. Metadata (title, authors) is fetched separately and falls back gracefully if the API is unavailable. The paper is still fully indexed and queryable even with placeholder metadata.
+
+### Garbled text from LaTeX PDFs
+Physics and math papers use LaTeX-rendered fonts that pdfplumber misreads, producing output like `b e a h A b r ξ o a s α v t`.
+
+**Fix:** We use **pymupdf** (fitz) as the primary extractor — it reconstructs reading order from glyph positions and handles multi-column layouts correctly. A post-processing step filters lines where average token length < 1.8 characters (the statistical signature of scrambled LaTeX fonts). pdfplumber remains as a fallback if pymupdf is not installed.
+
+### Anaconda overriding the venv Python
+If you see `(base)` and `(.venv)` in your prompt simultaneously, conda is winning.
+
+**Fix:**
+```bash
+conda deactivate
+source .venv/bin/activate
+which python3  # must show .venv path
+```
+
+### Yellow squiggles in VS Code
+VS Code is using the wrong interpreter.
+
+**Fix:** `Ctrl+Shift+P` → "Python: Select Interpreter" → choose `.venv`.
+
+### Wrong python being used for test scripts
+Always use the full venv path:
+```bash
+/path/to/project/.venv/bin/python3 test_local.py --fetch --arxiv-id 2005.11401
+```
 
 ---
 
@@ -192,43 +217,17 @@ Show me my reading list
 ```
 arxiv-mcp-server/
 ├── src/
-│   ├── server.py          # MCP server — registers all 6 tools
-│   ├── arxiv_client.py    # ArXiv API search + PDF download/extraction
-│   ├── vectorless_rag.py  # BM25 + RRF + contextual compression
-│   └── reading_list.py    # JSON-backed reading list
+│   ├── server.py           # MCP server — registers all 6 tools
+│   ├── arxiv_client.py     # ArXiv search + direct PDF download/extraction
+│   ├── vectorless_rag.py   # BM25 + RRF + contextual compression
+│   └── reading_list.py     # JSON-backed reading list
 ├── web/
-│   └── index.html         # Live landing page (deployed to GitHub Pages)
+│   └── index.html          # Live landing page (GitHub Pages)
 ├── tests/
-│   └── test_core.py       # pytest suite
-├── test_local.py          # standalone local test script (no Claude needed)
+│   └── test_core.py        # pytest suite (runs on every push via CI)
+├── test_local.py           # Standalone demo — no Claude needed
 └── pyproject.toml
 ```
-
----
-
-## Common issues
-
-**`ModuleNotFoundError: No module named 'encodings'`**
-Your terminal is using the wrong Python. Fix:
-```bash
-unset PYTHONPATH && unset PYTHONHOME
-source .venv/bin/activate
-```
-
-**Conda overriding the venv**
-If you see `(base)` and `(.venv)` in your prompt simultaneously:
-```bash
-conda deactivate
-source .venv/bin/activate
-```
-
-**Yellow squiggles in VS Code**
-`Ctrl+Shift+P` → "Python: Select Interpreter" → choose `.venv`.
-
-**MCP tools not showing in Claude Desktop**
-- Confirm you're on Claude Pro (required for MCP)
-- Use the full `.venv` Python path in the config, not just `python` or `python3`
-- Fully quit Claude Desktop (`Cmd+Q`) and reopen — don't just close the window
 
 ---
 
@@ -238,14 +237,15 @@ source .venv/bin/activate
 |-----------|---------|------|
 | MCP protocol | `mcp` | stdio server framework |
 | ArXiv | `arxiv` | paper search + metadata |
-| PDF extraction | `pdfplumber` | text from PDFs |
-| HTTP | `httpx` | async PDF download |
-| Retrieval | BM25 (built-in, no deps) | vectorless keyword search |
+| PDF download | `httpx` | direct CDN download, no rate limit |
+| PDF extraction | `pymupdf` (primary) | handles LaTeX, multi-column |
+| PDF extraction | `pdfplumber` (fallback) | general extraction |
+| Retrieval | BM25 (built-in) | vectorless keyword search |
 | Fusion | RRF (built-in) | multi-query result merging |
 | Compression | sentence BM25 (built-in) | extract relevant sentences |
 | Persistence | JSON | BM25 index + reading list |
 
-**Zero ML dependencies for retrieval.** No PyTorch, no sentence-transformers, no model downloads.
+**Zero ML dependencies for retrieval.** No PyTorch, no sentence-transformers, no model downloads for the RAG pipeline.
 
 ---
 
@@ -257,6 +257,14 @@ pytest tests/ -v --asyncio-mode=auto
 ruff check src/
 ```
 
+## Roadmap
+
+- [ ] Qdrant/ChromaDB backend option for larger libraries
+- [ ] LLM-powered query expansion (replaces rule-based fallback)
+- [ ] Multi-user support with shared paper libraries
+- [ ] Semantic Scholar + PubMed as additional sources
+- [ ] Citation graph traversal — fetch papers that cite or are cited by a paper
+
 ## License
 
-MIT
+MIT — built by [Ratnam Ojha](https://github.com/RatnamOjha)
