@@ -64,7 +64,14 @@ async def test_fetch(arxiv_id: str = DEFAULT_PAPER):
 
     print(f"  Downloading PDF and building BM25 index...")
     print(f"  (this takes 10-20 seconds)")
-    result = await client.fetch_and_index_vectorless(arxiv_id, rag)
+    try:
+        result = await client.fetch_and_index_vectorless(arxiv_id, rag)
+    except RuntimeError as e:
+        print(f"\n  ✗  {e}")
+        return None
+    except Exception as e:
+        print(f"\n  ✗  Unexpected error: {e}")
+        return None
 
     ok(result["message"])
     ok(f"Retrieval method: {result['retrieval_method']}")

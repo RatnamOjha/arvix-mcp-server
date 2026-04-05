@@ -113,7 +113,7 @@ class BM25:
         return scores[:top_k]
 
 
-# ── Reciprocal Rank Fusion ─────────────────────────────────────────────────────
+# Reciprocal Rank Fusion 
 
 def reciprocal_rank_fusion(
     ranked_lists: list[list[tuple[int, float]]],
@@ -134,7 +134,7 @@ def reciprocal_rank_fusion(
     return sorted(rrf_scores.items(), key=lambda x: x[1], reverse=True)
 
 
-# ── Vectorless RAG Engine ──────────────────────────────────────────────────────
+# Vectorless RAG Engine
 
 class VectorlessRAG:
     """
@@ -160,7 +160,7 @@ class VectorlessRAG:
 
         self._load()
 
-    # ── Indexing ───────────────────────────────────────────────────────────────
+    # Indexing
 
     def add_paper(self, arxiv_id: str, chunks: list[str], metadata: dict) -> None:
         """Index a paper. Idempotent."""
@@ -192,7 +192,7 @@ class VectorlessRAG:
             self.bm25.index(self.chunks)
             self._indexed = True
 
-    # ── Query Pipeline ─────────────────────────────────────────────────────────
+    # Query Pipeline
 
     async def query(
         self,
@@ -371,7 +371,7 @@ Output:"""
         sentences = re.split(r'(?<=[.!?])\s+', text.strip())
         return [s for s in sentences if len(s) > 20]
 
-    # ── Persistence ────────────────────────────────────────────────────────────
+    # Persistence
 
     def _save(self) -> None:
         payload = {
@@ -394,7 +394,7 @@ Output:"""
                 self._rebuild_index()
             logger.info(f"Loaded vectorless index: {len(self.chunks)} chunks")
 
-    # ── Helpers ────────────────────────────────────────────────────────────────
+    # Helpers
 
     def list_papers(self) -> list[dict]:
         return list(self.papers.values())
