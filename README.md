@@ -55,7 +55,7 @@ You can use the full pipeline — search, fetch, index, and query — directly f
 
 ```bash
 # Clone and install
-git clone https://github.com/yourusername/arxiv-mcp-server
+git clone https://github.com/RatnamOjha/arxiv-mcp-server
 cd arxiv-mcp-server
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e .
@@ -80,12 +80,63 @@ Everything persists between runs at `~/.arxiv-mcp/`.
 
 ---
 
+## Test with your own paper
+
+Have a specific ArXiv paper you want to try? Here's all you need.
+
+**Step 1 — Find your paper ID**
+
+The ID is the number at the end of any ArXiv URL:
+```
+https://arxiv.org/abs/2301.07041
+                   ^^^^^^^^^^^^^ this is your paper ID
+```
+
+**Step 2 — Fetch and index it**
+
+```bash
+python test_local.py --fetch --arxiv-id 2301.07041
+```
+
+This downloads the full PDF, extracts the text, and builds the BM25 index.
+Takes about 10–20 seconds depending on paper length.
+
+**Step 3 — Ask questions about it**
+
+```bash
+python test_local.py --query --question "what is the main contribution of this paper?"
+python test_local.py --query --question "what datasets did they evaluate on?"
+python test_local.py --query --question "what are the limitations?"
+```
+
+**Step 4 — Check your library**
+
+```bash
+python test_local.py --library
+```
+
+Shows all papers indexed so far. Everything persists between runs —
+build up a library over time and query across all of them at once.
+
+**Fetch multiple papers and query across all of them:**
+
+```bash
+python test_local.py --fetch --arxiv-id 2301.07041
+python test_local.py --fetch --arxiv-id 2305.10601
+python test_local.py --fetch --arxiv-id 2005.11401
+
+# Ask a question that spans all three
+python test_local.py --query --question "how do these papers approach retrieval differently?"
+```
+
+---
+
 ## With Claude Pro — MCP integration
 
 ### Install
 
 ```bash
-git clone https://github.com/yourusername/arxiv-mcp-server
+git clone https://github.com/RatnamOjha/arxiv-mcp-server
 cd arxiv-mcp-server
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e .
