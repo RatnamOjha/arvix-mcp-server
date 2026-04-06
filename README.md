@@ -57,9 +57,9 @@ Cited context returned to Claude
 
 ---
 
-## No Claude Pro? No problem
+## No Claude Pro? Use it entirely from your terminal
 
-The entire ML pipeline runs from your terminal with `test_local.py`. Claude Pro is only needed for the Claude Desktop chat interface.
+Claude Pro is only needed for the Claude Desktop chat interface. The full pipeline — search, fetch, index, RAG query — runs locally with `test_local.py` and `test_mcp.py`.
 
 ### Setup
 
@@ -70,60 +70,72 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install -e .
 ```
 
-### Run tests
-
-```bash
-python3 test_local.py                          # full end-to-end demo
-python3 test_local.py --search                 # live ArXiv search
-python3 test_local.py --fetch --arxiv-id 2005.11401   # fetch a paper
-python3 test_local.py --query --question "what is BM25?"
-python3 test_local.py --library                # see what's indexed
-```
+> **Anaconda users:** always run with the full venv path to avoid conflicts:
+> `/path/to/arvix-mcp-server/.venv/bin/python3 test_local.py ...`
 
 ---
 
-## Test with your own paper
+### Finding your paper ID
 
-### Step 1 — Find your paper ID
+The ID is the number at the end of any ArXiv URL:
 
 ```
 https://arxiv.org/abs/2301.07041
                    ^^^^^^^^^^^^^ this is your paper ID
 ```
 
-### Step 2 — Fetch and index it
+---
+
+### All commands — with full output by default
+
+`--full` is included in every query command below. Truncated output is never useful.
 
 ```bash
+# 1. Search ArXiv live
+python3 test_local.py --search
+
+# 2. Fetch and index a paper (downloads PDF directly — no rate limiting)
 python3 test_local.py --fetch --arxiv-id 2301.07041
-```
 
-Downloads the PDF directly (no API, no rate limiting), extracts text using pymupdf, chunks and indexes into BM25.
+# 3. Query your whole library
+python3 test_local.py --query --question "what problem does this paper solve?" --full
 
-### Step 3 — Query it
+# 4. Query one specific paper only
+python3 test_local.py --query --paper 2301.07041 --question "what are the limitations?" --full
 
-```bash
-# Query the whole library
-python3 test_local.py --query --question "what problem does this paper solve?"
-
-# Query one specific paper only
-python3 test_local.py --query --paper 2301.07041 --question "what are the limitations?"
-
-# See full untruncated output
-python3 test_local.py --query --paper 2301.07041 --question "what methods do they use?" --full
-```
-
-### Step 4 — Build a multi-paper library
-
-```bash
+# 5. Build a multi-paper library and query across all of them
 python3 test_local.py --fetch --arxiv-id 2301.07041
 python3 test_local.py --fetch --arxiv-id 2305.10601
 python3 test_local.py --fetch --arxiv-id 2005.11401
+python3 test_local.py --query --question "how do these papers approach retrieval?" --full
 
-# Cross-paper query
-python3 test_local.py --query --question "how do these papers approach retrieval differently?"
+# 6. See everything indexed
+python3 test_local.py --library
+
+# 7. Run everything at once (end-to-end demo)
+python3 test_local.py
 ```
 
-Everything persists at `~/.arxiv-mcp/` between runs.
+Everything persists at `~/.arxiv-mcp/` between runs — fetch once, query forever.
+
+---
+
+### Test the MCP protocol directly (without Claude)
+
+`test_mcp.py` spawns the server as a subprocess and sends it real JSON-RPC
+messages — byte-for-byte identical to what Claude Desktop sends. If this works,
+the Claude Desktop integration will work too.
+
+```bash
+# Test all tools
+python3 test_mcp.py
+
+# Test specific tools
+python3 test_mcp.py --tool search_papers
+python3 test_mcp.py --tool fetch_paper --arxiv-id 2005.11401
+python3 test_mcp.py --tool query_library --question "what is BM25?" --paper 2005.11401
+python3 test_mcp.py --tool list_library
+```
 
 ---
 
@@ -264,7 +276,3 @@ ruff check src/
 - [ ] Multi-user support with shared paper libraries
 - [ ] Semantic Scholar + PubMed as additional sources
 - [ ] Citation graph traversal — fetch papers that cite or are cited by a paper
-
-## License
-
-MIT — built by [Ratnam Ojha](https://github.com/RatnamOjha)

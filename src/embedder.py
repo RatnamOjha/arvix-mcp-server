@@ -5,7 +5,6 @@ Uses all-MiniLM-L6-v2 by default (fast, 384-dim, great for retrieval).
 
 import asyncio
 import logging
-from typing import Optional
 
 import numpy as np
 

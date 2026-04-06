@@ -5,7 +5,6 @@ Retrieves relevant chunks, reranks with a cross-encoder, formats context.
 
 import asyncio
 import logging
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
