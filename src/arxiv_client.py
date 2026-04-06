@@ -15,13 +15,15 @@ import logging
 import re
 import tempfile
 from pathlib import Path
-from typing import Optional
-
 import arxiv
 import httpx
 import pdfplumber
+from typing import Optional
+
+# pymupdf (fitz) — better extractor for LaTeX/multi-column PDFs.
+# Optional dependency: falls back to pdfplumber if not installed.
 try:
-    import fitz  # pymupdf — better for LaTeX/multi-column PDFs
+    import fitz as _fitz  # noqa: F401
     HAS_FITZ = True
 except ImportError:
     HAS_FITZ = False
@@ -221,7 +223,7 @@ class ArxivClient:
         pymupdf extraction — best for LaTeX papers.
         Uses 'text' mode which reconstructs reading order across columns.
         """
-        import fitz
+        import fitz  # noqa: PLC0415
         doc = fitz.open(str(path))
         pages = []
         for page in doc[:40]:
