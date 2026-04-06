@@ -154,7 +154,7 @@ async def run_all(arxiv_id: str = DEFAULT_PAPER):
     print("  Run again anytime — indexed papers persist between runs.\n")
 
 
-# ── Entry point ───────────────────────────────────────────────────────────────
+# Entry point
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Test ArXiv MCP server locally")

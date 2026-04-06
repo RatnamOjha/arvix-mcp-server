@@ -145,7 +145,7 @@ class MCPSession:
         self.proc.terminate()
         self.proc.wait()
 
-# ── Individual tool tests ─────────────────────────────────────────────────────
+# Individual tool tests
 
 def test_list_tools(session: MCPSession):
     header("tools/list — what tools are registered?")

@@ -223,7 +223,7 @@ class ArxivClient:
         pymupdf extraction — best for LaTeX papers.
         Uses 'text' mode which reconstructs reading order across columns.
         """
-        import fitz  # noqa: PLC0415
+        import fitz  
         doc = fitz.open(str(path))
         pages = []
         for page in doc[:40]:
