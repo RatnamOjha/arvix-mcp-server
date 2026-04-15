@@ -39,7 +39,13 @@ import string
 from collections import Counter, defaultdict
 from pathlib import Path
 
+import os as _os
+
 logger = logging.getLogger(__name__)
+
+# Optional Groq key for real LLM query expansion
+# Free tier at https://console.groq.com — no credit card needed
+_GROQ_KEY = _os.environ.get("GROQ_API_KEY", "")
 
 
 # ── BM25 Implementation ────────────────────────────────────────────────────────
@@ -299,47 +305,79 @@ class VectorlessRAG:
 
     async def _expand_query(self, question: str) -> list[str]:
         """
-        Use the LLM to generate keyword-rich query variants.
-        
-        This is the vectorless equivalent of HyDE — instead of generating a
-        hypothetical document to embed, we generate keyword variants to maximize
-        BM25 recall across different terminologies.
+        Generate keyword-rich query variants to maximize BM25 recall.
+
+        Uses Groq (free) if GROQ_API_KEY is set, otherwise falls back
+        to a fast rule-based extractor. The Groq path produces much
+        better domain-specific variants (e.g. "speculative decoding" →
+        ["draft token LLM inference acceleration", "autoregressive
+        generation speed token prediction"]).
         """
-        prompt = f"""Given this research question, generate 2 alternative keyword-focused search queries that would help find relevant content in academic papers. Return ONLY a JSON array of 2 strings, nothing else.
+        prompt = (
+            "Given this research question, generate 2 alternative keyword-focused "
+            "search queries for finding relevant content in academic papers. "
+            "Return ONLY a JSON array of 2 strings, nothing else.\n\n"
+            f"Question: {question}\n\n"
+            'Example: ["transformer attention mechanism self-attention", '
+            '"BERT GPT language model pretraining"]\n\nOutput:'
+        )
 
-Question: {question}
+        if _GROQ_KEY:
+            try:
+                result = await self._call_groq_expansion(prompt)
+                parsed = json.loads(result)
+                if isinstance(parsed, list) and len(parsed) >= 1:
+                    logger.info(f"Groq query expansion: {parsed}")
+                    return [str(q) for q in parsed[:2]]
+            except Exception as e:
+                logger.warning(f"Groq expansion failed, using rule-based: {e}")
 
-Example output: ["transformer attention mechanism self-attention", "BERT GPT language model pretraining"]
+        # Rule-based fallback — always works, no API needed
+        return self._rule_based_expansion(question)
 
-Output:"""
+    async def _call_groq_expansion(self, prompt: str) -> str:
+        """Call Groq API for query expansion. Free tier, no credit card."""
+        import httpx
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.post(
+                "https://api.groq.com/openai/v1/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {_GROQ_KEY}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": "llama-3.1-8b-instant",
+                    "messages": [{"role": "user", "content": prompt}],
+                    "max_tokens": 80,
+                    "temperature": 0.3,
+                },
+            )
+            resp.raise_for_status()
+            text = resp.json()["choices"][0]["message"]["content"].strip()
+            # Extract JSON array even if model adds extra text
+            start, end = text.find("["), text.rfind("]")
+            if start != -1 and end != -1:
+                return text[start:end+1]
+            return text
 
-        try:
-            loop = asyncio.get_event_loop()
-            # This runs synchronously in executor to avoid blocking
-            result = await loop.run_in_executor(None, self._call_local_expansion, prompt)
-            parsed = json.loads(result)
-            if isinstance(parsed, list):
-                return [str(q) for q in parsed[:2]]
-        except Exception as e:
-            logger.warning(f"Query expansion failed, using original only: {e}")
-        return []
-
-    def _call_local_expansion(self, prompt: str) -> str:
+    def _rule_based_expansion(self, question: str) -> list[str]:
         """
-        Simple rule-based query expansion as fallback (no external API needed).
-        In production you'd call an LLM API here.
+        Fast keyword extraction — no API, always works.
+        Filters stopwords, returns two overlapping keyword windows.
         """
-        # Extract key noun phrases from the question as additional query variants
-        # This is a lightweight fallback — replace with actual LLM call in production
-        words = re.findall(r'\b[a-zA-Z]{4,}\b', prompt.lower())
-        stopwords = {'what', 'when', 'where', 'which', 'that', 'this', 'with',
-                     'from', 'have', 'been', 'does', 'about', 'paper', 'research',
-                     'given', 'return', 'only', 'output', 'example', 'generate',
-                     'find', 'search', 'question', 'help', 'would', 'into'}
-        keywords = [w for w in words if w not in stopwords][:8]
+        words = re.findall(r'\b[a-zA-Z]{4,}\b', question.lower())
+        stopwords = {
+            'what', 'when', 'where', 'which', 'that', 'this', 'with',
+            'from', 'have', 'been', 'does', 'about', 'paper', 'research',
+            'given', 'return', 'only', 'find', 'search', 'help', 'would',
+            'into', 'their', 'these', 'those', 'than', 'then', 'them',
+        }
+        keywords = [w for w in words if w not in stopwords][:10]
+        if not keywords:
+            return []
         variant1 = " ".join(keywords[:6])
-        variant2 = " ".join(keywords[2:8])
-        return json.dumps([variant1, variant2])
+        variant2 = " ".join(keywords[3:9]) if len(keywords) > 3 else variant1
+        return [variant1, variant2]
 
     async def _compress_chunks(
         self,
