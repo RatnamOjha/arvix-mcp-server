@@ -410,18 +410,30 @@ async def run_all(arxiv_id: str = DEFAULT_PAPER):
 # ── Entry point ───────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Test ArXiv MCP pipeline locally")
-    parser.add_argument("--search", action="store_true")
-    parser.add_argument("--fetch", action="store_true")
-    parser.add_argument("--query", action="store_true")
-    parser.add_argument("--library", action="store_true")
-    parser.add_argument("--edge", action="store_true", help="Run edge case tests")
-    parser.add_argument("--all", action="store_true", help="Run all tests including edge cases")
-    parser.add_argument("--arxiv-id", default=DEFAULT_PAPER)
-    parser.add_argument("--question", default="what retrieval method does RAG use?")
-    parser.add_argument("--paper", default=None)
-    parser.add_argument("--full", action="store_true")
-    parser.add_argument("--no-generate", action="store_true", help="Skip LLM answer generation")
+    parser = argparse.ArgumentParser(
+        description="ArXiv MCP — local test runner",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+examples:
+  python3 test_local.py -s                          search ArXiv
+  python3 test_local.py -f -i 2507.07171            fetch a paper
+  python3 test_local.py -q -p 2507.07171 -F         query one paper, full output
+  python3 test_local.py -q -Q "what is BM25?" -F    custom question
+  python3 test_local.py -e                          run edge case tests
+  python3 test_local.py -a                          run everything
+        """
+    )
+    parser.add_argument("--search",   "-s", action="store_true", help="Search ArXiv live")
+    parser.add_argument("--fetch",    "-f", action="store_true", help="Fetch + index a paper")
+    parser.add_argument("--query",    "-q", action="store_true", help="RAG query your library")
+    parser.add_argument("--library",  "-l", action="store_true", help="Show indexed papers")
+    parser.add_argument("--edge",     "-e", action="store_true", help="Run edge case tests")
+    parser.add_argument("--all",      "-a", action="store_true", help="Run everything")
+    parser.add_argument("--arxiv-id", "-i", default=DEFAULT_PAPER, metavar="ID",  help="Paper ID to fetch (default: 2005.11401)")
+    parser.add_argument("--question", "-Q", default="what retrieval method does RAG use?", metavar="Q", help="Question for RAG query")
+    parser.add_argument("--paper",    "-p", default=None, metavar="ID", help="Restrict query to one paper ID")
+    parser.add_argument("--full",     "-F", action="store_true", help="Show full untruncated output")
+    parser.add_argument("--no-generate", "-n", action="store_true", help="Skip LLM answer generation")
     args = parser.parse_args()
 
     if args.search:

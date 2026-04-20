@@ -4,6 +4,7 @@
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/)
 [![MCP](https://img.shields.io/badge/protocol-MCP-purple.svg)](https://modelcontextprotocol.io)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
 
@@ -85,37 +86,71 @@ https://arxiv.org/abs/2301.07041
 
 ---
 
-### All commands — with full output by default
+### All commands
 
-`--full` is included in every query command below. Truncated output is never useful.
+Every flag has a short alias. Use whichever you prefer.
 
 ```bash
-# 1. Search ArXiv live
-python3 test_local.py --search
+# Search ArXiv live
+python3 test_local.py -s
 
-# 2. Fetch and index a paper (downloads PDF directly — no rate limiting)
-python3 test_local.py --fetch --arxiv-id 2301.07041
+# Fetch and index a paper (direct CDN download — no rate limiting)
+python3 test_local.py -f -i 2301.07041
 
-# 3. Query your whole library
-python3 test_local.py --query --question "what problem does this paper solve?" --full
+# Query your whole library — full output
+python3 test_local.py -q -F
 
-# 4. Query one specific paper only
-python3 test_local.py --query --paper 2301.07041 --question "what are the limitations?" --full
+# Query one specific paper only
+python3 test_local.py -q -p 2301.07041 -Q "what are the limitations?" -F
 
-# 5. Build a multi-paper library and query across all of them
-python3 test_local.py --fetch --arxiv-id 2301.07041
-python3 test_local.py --fetch --arxiv-id 2305.10601
-python3 test_local.py --fetch --arxiv-id 2005.11401
-python3 test_local.py --query --question "how do these papers approach retrieval?" --full
+# Build a multi-paper library and query across all of them
+python3 test_local.py -f -i 2301.07041
+python3 test_local.py -f -i 2305.10601
+python3 test_local.py -f -i 2005.11401
+python3 test_local.py -q -Q "how do these papers approach retrieval?" -F
 
-# 6. See everything indexed
-python3 test_local.py --library
+# See everything indexed
+python3 test_local.py -l
 
-# 7. Run everything at once (end-to-end demo)
-python3 test_local.py
+# Run edge case tests
+python3 test_local.py -e
+
+# Run everything at once
+python3 test_local.py -a
 ```
 
+| Short | Long | Description |
+|-------|------|-------------|
+| `-s` | `--search` | Search ArXiv |
+| `-f` | `--fetch` | Fetch + index a paper |
+| `-q` | `--query` | RAG query |
+| `-l` | `--library` | Show library |
+| `-e` | `--edge` | Edge case tests |
+| `-a` | `--all` | Run everything |
+| `-i ID` | `--arxiv-id ID` | Paper ID to fetch |
+| `-p ID` | `--paper ID` | Restrict query to one paper |
+| `-Q "..."` | `--question "..."` | Question to ask |
+| `-F` | `--full` | Full untruncated output |
+| `-n` | `--no-generate` | Skip LLM answer generation |
+
 Everything persists at `~/.arxiv-mcp/` between runs — fetch once, query forever.
+
+---
+
+### Enable LLM answer generation (free)
+
+By default the pipeline shows retrieval context. To get a full cited LLM answer, set a **free** Groq key — no credit card needed.
+
+```bash
+# 1. Get a free key at https://console.groq.com (takes 60 seconds)
+# 2. Set it
+export GROQ_API_KEY=gsk_your_key_here
+
+# 3. Run — you now get retrieval + generated answer
+python3 test_local.py -q -p 2005.11401 -Q "what is the main contribution?" -F
+```
+
+Groq's free tier: 14,400 requests/day on `llama-3.1-8b-instant`. Anthropic (`ANTHROPIC_API_KEY`) works as a fallback if you prefer.
 
 ---
 
@@ -274,4 +309,8 @@ ruff check src/
 - [ ] LLM-powered query expansion (replaces rule-based fallback)
 - [ ] Multi-user support with shared paper libraries
 - [ ] Semantic Scholar + PubMed as additional sources
-- [ ] Citation graph traversal — fetch papers that cite or are cited by a paper
+- [ ] Citation graph traversal - fetch papers that cite or are cited by a paper
+
+## License
+
+MIT — built by [Ratnam Ojha](https://github.com/RatnamOjha)
