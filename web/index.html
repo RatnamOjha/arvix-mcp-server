@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ArXiv MCP — Research Intelligence for Claude</title>
+<title>ArXiv MCP -- Research Intelligence for Claude</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -24,8 +24,8 @@ body:has(a:hover) #cr,body:has(button:hover) #cr{width:48px;height:48px;border-c
 nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.4rem 3.5rem;border-bottom:1px solid var(--line);background:rgba(8,8,12,0.85);backdrop-filter:blur(24px);}
 .logo{font-family:var(--serif);font-size:1.1rem;color:var(--gold);letter-spacing:0.02em;}
 .logo sub{font-family:var(--mono);font-size:0.6rem;font-weight:300;color:var(--muted);vertical-align:middle;margin-left:0.5rem;letter-spacing:0.12em;text-transform:uppercase;}
-.nav-links{display:flex;gap:2.5rem;list-style:none}
-.nav-links a{font-size:0.7rem;letter-spacing:0.14em;color:var(--muted);text-decoration:none;text-transform:uppercase;transition:color .2s;}
+.nav-links{display:flex;gap:2rem;list-style:none}
+.nav-links a{font-size:0.68rem;letter-spacing:0.14em;color:var(--muted);text-decoration:none;text-transform:uppercase;transition:color .2s;}
 .nav-links a:hover{color:var(--gold)}
 .nav-cta{font-family:var(--mono);font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(201,169,110,0.35);padding:.45rem 1.1rem;text-decoration:none;transition:background .2s,border-color .2s;}
 .nav-cta:hover{background:rgba(201,169,110,0.07);border-color:rgba(201,169,110,0.6)}
@@ -46,8 +46,8 @@ h1{font-family:var(--serif);font-size:clamp(3.6rem,7.5vw,7rem);line-height:1.0;l
 .term-top{background:var(--ink3);padding:.65rem 1rem;display:flex;align-items:center;gap:.45rem;border-bottom:1px solid var(--line);}
 .dot{width:9px;height:9px;border-radius:50%}.d1{background:#ff5f56}.d2{background:#ffbd2e}.d3{background:#27c93f}
 .term-label{margin-left:auto;font-size:.62rem;color:var(--muted);letter-spacing:.1em}
-.term-body{padding:1.4rem;font-size:.76rem;line-height:2.1;min-height:220px}
-.tp{color:var(--gold)}.tc{color:var(--text)}.to{color:var(--muted)}.tok{color:var(--ice)}
+.term-body{padding:1.4rem;font-size:.76rem;line-height:2.1;min-height:240px}
+.tp{color:var(--gold)}.tc{color:var(--text)}.to{color:var(--muted)}.tok{color:var(--ice)}.tg{color:#7ec87e}
 .tcr{display:inline-block;width:7px;height:1em;background:var(--gold);vertical-align:text-bottom;animation:blink 1s step-end infinite}
 @keyframes blink{50%{opacity:0}}
 .rule{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 3.5rem;display:flex;align-items:center;gap:1.5rem;}
@@ -65,6 +65,18 @@ h1{font-family:var(--serif);font-size:clamp(3.6rem,7.5vw,7rem);line-height:1.0;l
 .t-name{font-size:.85rem;font-weight:500;color:var(--gold);margin-bottom:.5rem;letter-spacing:.04em}
 .t-sig{font-size:.66rem;color:var(--ice);background:rgba(168,196,212,0.07);border:1px solid rgba(168,196,212,0.12);display:inline-block;padding:.25rem .65rem;border-radius:2px;margin-bottom:1rem;}
 .t-desc{font-size:.78rem;color:var(--muted);line-height:1.85}
+.vless-box{background:var(--ink2);border:1px solid rgba(201,169,110,0.2);padding:2.5rem;margin-top:3.5rem;position:relative;overflow:hidden;}
+.vless-box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.vless-tag{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;display:flex;align-items:center;gap:.7rem;}
+.vless-tag::before{content:'';width:6px;height:6px;background:var(--gold);border-radius:50%;}
+.vless-title{font-family:var(--serif);font-size:1.6rem;margin-bottom:1rem;font-style:italic}
+.vless-copy{font-size:.8rem;color:var(--muted);line-height:2.0;max-width:680px}
+.vless-copy strong{color:var(--text);font-weight:500}
+.pipeline{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:1.5rem;}
+.pipe-step{background:var(--ink3);padding:1.2rem 1rem}
+.ps-n{font-size:.58rem;color:var(--dim);letter-spacing:.12em;margin-bottom:.5rem}
+.ps-name{font-size:.76rem;font-weight:500;color:var(--ice);margin-bottom:.3rem}
+.ps-desc{font-size:.68rem;color:var(--muted);line-height:1.7}
 .steps{display:flex;flex-direction:column}
 .step{display:grid;grid-template-columns:3.5rem 1fr;gap:1.5rem;padding:1.8rem 0;border-bottom:1px solid var(--line);}
 .step:last-child{border-bottom:none}
@@ -77,18 +89,6 @@ h1{font-family:var(--serif);font-size:clamp(3.6rem,7.5vw,7rem);line-height:1.0;l
 .si:last-child{border-bottom:none}
 .sdot{width:5px;height:5px;border-radius:50%;flex-shrink:0}.stag{margin-left:auto;font-size:.6rem;color:var(--dim);letter-spacing:.08em}
 .arch-grid{display:grid;grid-template-columns:1fr 1fr;gap:3.5rem;align-items:start;margin-top:3.5rem}
-.vless-box{background:var(--ink2);border:1px solid rgba(201,169,110,0.2);padding:2.5rem;margin-top:3.5rem;position:relative;overflow:hidden;}
-.vless-box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
-.vless-tag{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;display:flex;align-items:center;gap:.7rem;}
-.vless-tag::before{content:'◆';font-size:.5rem}
-.vless-title{font-family:var(--serif);font-size:1.6rem;margin-bottom:1rem;font-style:italic}
-.vless-copy{font-size:.8rem;color:var(--muted);line-height:2.0;max-width:640px}
-.vless-copy strong{color:var(--text);font-weight:500}
-.pipeline{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:1.5rem;}
-.pipe-step{background:var(--ink3);padding:1.2rem 1rem}
-.ps-n{font-size:.58rem;color:var(--dim);letter-spacing:.12em;margin-bottom:.5rem}
-.ps-name{font-size:.76rem;font-weight:500;color:var(--ice);margin-bottom:.3rem}
-.ps-desc{font-size:.68rem;color:var(--muted);line-height:1.7}
 .install{display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line)}
 .ist{background:var(--ink2);padding:1.8rem 2rem;display:grid;grid-template-columns:2.5rem 1fr;gap:1.5rem;align-items:start;transition:background .2s;}
 .ist:hover{background:var(--ink3)}
@@ -96,20 +96,21 @@ h1{font-family:var(--serif);font-size:clamp(3.6rem,7.5vw,7rem);line-height:1.0;l
 .i-title{font-size:.82rem;font-weight:500;color:var(--text);margin-bottom:.4rem}
 .i-code{background:var(--ink);border:1px solid var(--line);border-radius:2px;padding:.65rem .9rem;font-size:.73rem;color:var(--ice);margin-top:.5rem;overflow-x:auto;white-space:pre;line-height:1.8;}
 .i-note{font-size:.72rem;color:var(--muted);margin-top:.45rem;line-height:1.7}
-
-/* tab switcher */
-.tab-bar{display:flex;gap:1px;background:var(--line);border:1px solid var(--line);border-bottom:none;margin-bottom:0;}
-.tab{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;padding:.75rem 1.5rem;background:var(--ink2);color:var(--muted);cursor:pointer;border:none;transition:background .2s,color .2s;flex:1;text-align:left;}
-.tab:hover{background:var(--ink3);color:var(--text)}
-.tab.active{background:var(--ink3);color:var(--gold);border-bottom:1px solid var(--ink3);}
-.tab-panel{display:none}.tab-panel.active{display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line);}
-
-/* id explainer */
+.i-note strong{color:var(--text)}
+.badge{display:inline-block;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;padding:.2rem .6rem;border-radius:2px;margin-right:.4rem;}
+.badge-free{background:rgba(126,200,126,0.12);border:1px solid rgba(126,200,126,0.3);color:#7ec87e}
+.badge-opt{background:rgba(168,196,212,0.08);border:1px solid rgba(168,196,212,0.2);color:var(--ice)}
+.cmd-grid{display:grid;grid-template-columns:auto 1fr;gap:.3rem 1.5rem;align-items:baseline;margin-top:.8rem;}
+.cmd-short{font-family:var(--mono);font-size:.73rem;color:var(--gold);white-space:nowrap}
+.cmd-desc{font-size:.72rem;color:var(--muted)}
 .id-box{background:var(--ink2);border:1px solid rgba(201,169,110,0.2);padding:1.5rem 2rem;position:relative;overflow:hidden;margin-bottom:1px;}
 .id-box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
-.id-url{font-size:.8rem;color:var(--muted);line-height:2.0;}
-.id-url strong{color:var(--text)}.id-hi{color:var(--gold);font-weight:500;background:rgba(201,169,110,0.1);padding:.1rem .4rem;border-radius:2px;}
-
+.id-hi{color:var(--gold);font-weight:500;background:rgba(201,169,110,0.1);padding:.1rem .4rem;border-radius:2px;}
+.tab-bar{display:flex;gap:1px;background:var(--line);border:1px solid var(--line);border-bottom:none;}
+.tab{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;padding:.75rem 1.5rem;background:var(--ink2);color:var(--muted);cursor:pointer;border:none;transition:background .2s,color .2s;flex:1;text-align:left;}
+.tab:hover{background:var(--ink3);color:var(--text)}
+.tab.active{background:var(--ink3);color:var(--gold);}
+.tab-panel{display:none}.tab-panel.active{display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line);}
 footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:3rem 3.5rem;max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
 .f-logo{font-family:var(--serif);font-size:1.4rem;font-style:italic;color:var(--dim)}
 .f-links{display:flex;gap:2rem}
@@ -146,32 +147,33 @@ footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:3rem
     <li><a href="#arch">Architecture</a></li>
     <li><a href="#install">Install</a></li>
   </ul>
-  <a href="https://github.com/RatnamOjha/arvix-mcp-server" class="nav-cta" target="_blank">GitHub ↗</a>
+  <a href="https://github.com/RatnamOjha/arvix-mcp-server" class="nav-cta" target="_blank">GitHub</a>
 </nav>
 
 <!-- HERO -->
 <section id="hero">
   <div class="hero-inner">
     <div class="hero-left">
-      <div class="h-tag">MCP Server &nbsp;·&nbsp; Open Source &nbsp;·&nbsp; Python</div>
+      <div class="h-tag">MCP Server · Open Source · Python</div>
       <h1>Research<br><span class="h1-i">intelligence</span><br><span class="h1-d">for Claude</span></h1>
       <p class="hero-copy">
         An MCP server that gives Claude <span>semantic paper search</span>,
-        full <span>RAG over your library</span>, and a novel
-        <span>vectorless retrieval pipeline</span> — no embeddings, no GPU.
+        full <span>RAG over your library</span>, and a
+        <span>vectorless retrieval pipeline</span> with no embeddings, no GPU,
+        and no paid subscription to get started.
       </p>
       <div class="ctas">
-        <a href="#try" class="btn btn-g">Try it now</a>
-        <a href="https://github.com/RatnamOjha/arvix-mcp-server" class="btn btn-o" target="_blank">View source →</a>
+        <a href="#try" class="btn btn-g">Try it free</a>
+        <a href="https://github.com/RatnamOjha/arvix-mcp-server" class="btn btn-o" target="_blank">View source</a>
       </div>
     </div>
     <div class="hero-right">
       <div class="term">
         <div class="term-top">
           <div class="dot d1"></div><div class="dot d2"></div><div class="dot d3"></div>
-          <span class="term-label">terminal — no Pro needed</span>
+          <span class="term-label">terminal -- no subscription needed</span>
         </div>
-        <div class="term-body" id="tb">
+        <div class="term-body">
           <div><span class="tp">$ </span><span id="tl"></span></div>
           <div id="tout" style="margin-top:.5rem"></div>
         </div>
@@ -180,7 +182,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:3rem
   </div>
 </section>
 
-<div class="rule"><div class="rule-txt">6 MCP tools · BM25 + RRF · contextual compression · zero embeddings</div></div>
+<div class="rule"><div class="rule-txt">6 MCP tools · BM25 + RRF · Groq generation · zero embeddings · free tier</div></div>
 
 <!-- TOOLS -->
 <section id="tools" class="sect">
@@ -189,51 +191,84 @@ footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:3rem
     <div class="sect-h">Six tools.<br><span class="sect-hi">One research assistant.</span></div>
   </div>
   <div class="tools rv2">
-    <div class="tool"><span class="t-n">01</span><div class="t-name">search_papers</div><div class="t-sig">query, max_results?, category?</div><p class="t-desc">Live ArXiv semantic search. Returns ranked results with titles, authors, abstracts, categories, and PDF links.</p></div>
-    <div class="tool"><span class="t-n">02</span><div class="t-name">fetch_paper</div><div class="t-sig">arxiv_id, add_to_reading_list?</div><p class="t-desc">Downloads the full PDF directly from ArXiv's CDN (no rate limiting), extracts text with pymupdf, chunks at 500 words, indexes into BM25.</p></div>
-    <div class="tool"><span class="t-n">03</span><div class="t-name">query_library</div><div class="t-sig">question, top_k?, arxiv_id_filter?</div><p class="t-desc">Full vectorless RAG: query expansion → multi-query BM25 → RRF fusion → sentence-level compression → cited context. Filter to one paper with arxiv_id_filter.</p></div>
-    <div class="tool"><span class="t-n">04</span><div class="t-name">summarize_paper</div><div class="t-sig">arxiv_id</div><p class="t-desc">Pulls intro + methods + conclusion chunks and asks Claude for a structured summary: problem, contribution, results, limitations.</p></div>
-    <div class="tool"><span class="t-n">05</span><div class="t-name">list_library</div><div class="t-sig">—</div><p class="t-desc">Returns all papers indexed in your local BM25 store with titles, authors, categories, and index dates.</p></div>
-    <div class="tool"><span class="t-n">06</span><div class="t-name">get_reading_list</div><div class="t-sig">—</div><p class="t-desc">Your saved reading list: metadata, timestamps, read/unread status, personal notes — persisted to JSON.</p></div>
+    <div class="tool"><span class="t-n">01</span><div class="t-name">search_papers</div><div class="t-sig">query, max_results?, category?</div><p class="t-desc">Live ArXiv search. Returns ranked results with titles, authors, abstracts, and PDF links. Supports category filters like cs.LG, cs.CL.</p></div>
+    <div class="tool"><span class="t-n">02</span><div class="t-name">fetch_paper</div><div class="t-sig">arxiv_id, add_to_reading_list?</div><p class="t-desc">Downloads PDF directly from ArXiv CDN (no rate limiting), extracts text with pymupdf, chunks at 500 words, indexes into BM25. Metadata fetched separately with graceful fallback.</p></div>
+    <div class="tool"><span class="t-n">03</span><div class="t-name">query_library</div><div class="t-sig">question, top_k?, arxiv_id_filter?</div><p class="t-desc">Full vectorless RAG: Groq query expansion into 3 BM25 variants, RRF fusion, sentence-level compression, cited context. Use arxiv_id_filter to scope to one paper.</p></div>
+    <div class="tool"><span class="t-n">04</span><div class="t-name">summarize_paper</div><div class="t-sig">arxiv_id</div><p class="t-desc">Pulls intro, methods, and conclusion chunks. Returns structured context for problem, contribution, results, and limitations.</p></div>
+    <div class="tool"><span class="t-n">05</span><div class="t-name">list_library</div><div class="t-sig">--</div><p class="t-desc">Lists all papers indexed in your local BM25 store with titles, authors, categories, and chunk counts.</p></div>
+    <div class="tool"><span class="t-n">06</span><div class="t-name">get_reading_list</div><div class="t-sig">--</div><p class="t-desc">Your saved reading list with metadata, timestamps, read/unread status, and personal notes, persisted to JSON.</p></div>
   </div>
 </section>
 
-<!-- TRY IT — unified section -->
+<!-- TRY IT -->
 <section id="try" class="sect" style="padding-top:0">
   <div class="rv">
-    <div class="sect-eye">No Claude Pro required</div>
+    <div class="sect-eye">No subscription required</div>
     <div class="sect-h">Try it from your terminal.<br><span class="sect-hi">All features, free.</span></div>
   </div>
 
   <div class="vless-box rv" style="margin-top:0">
-    <div class="vless-tag">How it works without Pro</div>
-    <div class="vless-title">Two ways to use this</div>
+    <div class="vless-tag">Two ways to use this</div>
+    <div class="vless-title">Free terminal vs Claude Pro</div>
     <p class="vless-copy">
-      <strong>Without Claude Pro</strong> — the full ML pipeline runs locally from your terminal.
-      Use <strong>test_local.py</strong> to search ArXiv, fetch papers, run RAG queries, and inspect your library.
-      Use <strong>test_mcp.py</strong> to test the actual MCP protocol — byte-for-byte identical to what Claude Desktop sends.<br><br>
-      <strong>With Claude Pro</strong> — connect the server to Claude Desktop and research in natural language.
+      <strong>Without Claude Pro</strong> -- the full ML pipeline runs locally from your terminal.
+      <strong>test_local.py</strong> runs search, fetch, indexing, RAG queries, and LLM answer generation.
+      <strong>test_mcp.py</strong> tests the actual MCP protocol stack, byte-for-byte identical to Claude Desktop.<br><br>
+      <strong>With Claude Pro</strong> -- connect to Claude Desktop and research in natural language.
       Claude calls the 6 tools automatically based on what you ask.
     </p>
+  </div>
+
+  <!-- Groq callout -->
+  <div class="vless-box rv" style="margin-top:1px;border-color:rgba(126,200,126,0.2)">
+    <div class="vless-tag" style="color:#7ec87e">Free LLM generation via Groq</div>
+    <div class="vless-title">14,400 requests/day. No credit card.</div>
+    <p class="vless-copy">
+      Get a free Groq API key at <strong>console.groq.com</strong> (60 seconds, no credit card).
+      Set <strong>GROQ_API_KEY</strong> and the server automatically uses
+      <strong>llama-3.1-8b-instant</strong> for query expansion and answer generation.
+      Anthropic works as a fallback. Nothing breaks if neither key is set -- retrieval still works fully.
+    </p>
+    <div class="i-code" style="margin-top:1rem;border-color:rgba(126,200,126,0.2)">export GROQ_API_KEY=gsk_your_key_here
+python3 test_local.py -q -p 2005.11401 -Q "what is the main contribution?" -F</div>
   </div>
 
   <!-- Paper ID explainer -->
   <div class="id-box rv" style="margin-top:1px">
     <div class="vless-tag" style="margin-bottom:.6rem">Finding your paper ID</div>
-    <p class="id-url">Every ArXiv URL contains the ID at the end:</p>
-    <p class="id-url" style="margin:.4rem 0"><strong>https://arxiv.org/abs/<span class="id-hi">2301.07041</span></strong></p>
-    <p class="id-url">That number is all you need. Version suffixes like <strong>v2</strong> are stripped automatically.</p>
+    <p style="font-size:.8rem;color:var(--muted);margin-bottom:.5rem">The ID is the number at the end of any ArXiv URL:</p>
+    <p style="font-size:.82rem;color:var(--text)">https://arxiv.org/abs/<span class="id-hi">2301.07041</span></p>
+    <p style="font-size:.72rem;color:var(--muted);margin-top:.5rem">Version suffixes like v2 are stripped automatically.</p>
   </div>
 
-  <!-- Tab switcher -->
+  <!-- Short flag reference -->
+  <div class="vless-box rv" style="margin-top:1px">
+    <div class="vless-tag">Short flags -- faster to type</div>
+    <div class="vless-title">All flags have one-letter aliases</div>
+    <p class="vless-copy" style="margin-bottom:1.2rem">Every long flag has a short version. Use whichever you prefer.</p>
+    <div class="cmd-grid">
+      <span class="cmd-short">-s</span><span class="cmd-desc">--search &nbsp;&nbsp;&nbsp; Search ArXiv live</span>
+      <span class="cmd-short">-f</span><span class="cmd-desc">--fetch &nbsp;&nbsp;&nbsp;&nbsp; Fetch and index a paper</span>
+      <span class="cmd-short">-q</span><span class="cmd-desc">--query &nbsp;&nbsp;&nbsp;&nbsp; RAG query your library</span>
+      <span class="cmd-short">-l</span><span class="cmd-desc">--library &nbsp;&nbsp; Show all indexed papers</span>
+      <span class="cmd-short">-e</span><span class="cmd-desc">--edge &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Run edge case tests</span>
+      <span class="cmd-short">-a</span><span class="cmd-desc">--all &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Run everything</span>
+      <span class="cmd-short">-i ID</span><span class="cmd-desc">--arxiv-id &nbsp; Paper ID to fetch</span>
+      <span class="cmd-short">-p ID</span><span class="cmd-desc">--paper &nbsp;&nbsp;&nbsp;&nbsp; Restrict query to one paper</span>
+      <span class="cmd-short">-Q "..."</span><span class="cmd-desc">--question &nbsp; Question to ask</span>
+      <span class="cmd-short">-F</span><span class="cmd-desc">--full &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Full untruncated output</span>
+      <span class="cmd-short">-n</span><span class="cmd-desc">--no-generate Skip LLM answer generation</span>
+    </div>
+  </div>
+
+  <!-- Tabs -->
   <div class="rv2" style="margin-top:1px">
     <div class="tab-bar">
-      <button class="tab active" onclick="switchTab('basic')">Getting started</button>
-      <button class="tab" onclick="switchTab('paper')">Your own paper</button>
-      <button class="tab" onclick="switchTab('mcp')">Test MCP protocol</button>
+      <button class="tab active" onclick="switchTab('basic',this)">Getting started</button>
+      <button class="tab" onclick="switchTab('paper',this)">Your own paper</button>
+      <button class="tab" onclick="switchTab('mcp',this)">Test MCP protocol</button>
     </div>
 
-    <!-- Tab: Getting started -->
     <div class="tab-panel active" id="tab-basic">
       <div class="ist">
         <div class="i-n">1</div>
@@ -243,92 +278,99 @@ footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:3rem
 cd arvix-mcp-server
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e .</div>
-          <div class="i-note">Anaconda users: use the full venv path to avoid conflicts — <strong>/path/to/project/.venv/bin/python3 test_local.py</strong></div>
+          <div class="i-note"><strong>Anaconda users:</strong> use the full venv path to avoid conflicts -- /path/to/project/.venv/bin/python3 test_local.py</div>
         </div>
       </div>
       <div class="ist">
         <div class="i-n">2</div>
         <div>
           <div class="i-title">Search ArXiv live</div>
-          <div class="i-code">python3 test_local.py --search</div>
-          <div class="i-note">Queries the live ArXiv API and returns ranked results with titles, authors, and IDs. No paper needed yet.</div>
+          <div class="i-code">python3 test_local.py -s</div>
+          <div class="i-note">Queries the live ArXiv API and returns ranked results with titles, authors, and IDs.</div>
         </div>
       </div>
       <div class="ist">
         <div class="i-n">3</div>
         <div>
           <div class="i-title">Fetch a paper and run RAG</div>
-          <div class="i-code">python3 test_local.py --fetch --arxiv-id 2005.11401
-python3 test_local.py --query --question "what retrieval method does RAG use?" --full</div>
-          <div class="i-note">Fetches the original RAG paper, indexes it, then runs the full BM25 + RRF + compression pipeline. <strong>--full</strong> shows the complete untruncated output.</div>
+          <div class="i-code">python3 test_local.py -f -i 2005.11401
+python3 test_local.py -q -Q "what retrieval method does RAG use?" -F</div>
+          <div class="i-note">Fetches the original RAG paper, builds the BM25 index, then runs the full pipeline. -F shows complete untruncated output.</div>
         </div>
       </div>
       <div class="ist">
         <div class="i-n">4</div>
         <div>
-          <div class="i-title">Run everything at once</div>
-          <div class="i-code">python3 test_local.py</div>
-          <div class="i-note">End-to-end demo: search → fetch → query → library. Good for a first run.</div>
+          <div class="i-title">Add Groq for full answer generation</div>
+          <div class="i-code">export GROQ_API_KEY=gsk_your_key_here
+python3 test_local.py -q -Q "what is BM25?" -F</div>
+          <div class="i-note">Free at console.groq.com. When set, every query returns a cited LLM answer on top of the retrieval context.</div>
+        </div>
+      </div>
+      <div class="ist">
+        <div class="i-n">5</div>
+        <div>
+          <div class="i-title">Run the full suite</div>
+          <div class="i-code">python3 test_local.py -a</div>
+          <div class="i-note">Runs search, fetch, RAG query, library listing, and all 6 edge case tests in sequence.</div>
         </div>
       </div>
     </div>
 
-    <!-- Tab: Your own paper -->
     <div class="tab-panel" id="tab-paper">
       <div class="ist">
         <div class="i-n">1</div>
         <div>
-          <div class="i-title">Fetch and index your paper</div>
-          <div class="i-code">python3 test_local.py --fetch --arxiv-id 2301.07041</div>
-          <div class="i-note">Downloads the PDF directly from ArXiv's CDN — no API rate limiting. Extracts text with pymupdf, builds BM25 index. Takes ~15 seconds.</div>
+          <div class="i-title">Fetch your paper</div>
+          <div class="i-code">python3 test_local.py -f -i 2301.07041</div>
+          <div class="i-note">Downloads PDF directly from ArXiv CDN. No API, no rate limiting. Extracts text with pymupdf, builds BM25 index. Takes about 15 seconds.</div>
         </div>
       </div>
       <div class="ist">
         <div class="i-n">2</div>
         <div>
-          <div class="i-title">Ask questions — scoped to your paper</div>
-          <div class="i-code">python3 test_local.py --query --paper 2301.07041 --question "what problem does this solve?" --full
-python3 test_local.py --query --paper 2301.07041 --question "what are the limitations?" --full
-python3 test_local.py --query --paper 2301.07041 --question "what datasets did they use?" --full</div>
-          <div class="i-note"><strong>--paper</strong> restricts BM25 search to that one paper only — no cross-contamination from other indexed papers. <strong>--full</strong> shows untruncated context.</div>
+          <div class="i-title">Ask questions scoped to that paper</div>
+          <div class="i-code">python3 test_local.py -q -p 2301.07041 -Q "what problem does this solve?" -F
+python3 test_local.py -q -p 2301.07041 -Q "what are the limitations?" -F
+python3 test_local.py -q -p 2301.07041 -Q "what datasets did they use?" -F</div>
+          <div class="i-note">-p restricts BM25 search to that paper only. No results bleed in from other indexed papers.</div>
         </div>
       </div>
       <div class="ist">
         <div class="i-n">3</div>
         <div>
           <div class="i-title">Build a multi-paper library</div>
-          <div class="i-code">python3 test_local.py --fetch --arxiv-id 2301.07041
-python3 test_local.py --fetch --arxiv-id 2305.10601
-python3 test_local.py --fetch --arxiv-id 2005.11401
-python3 test_local.py --query --question "how do these papers approach retrieval differently?" --full</div>
-          <div class="i-note">Papers persist at ~/.arxiv-mcp/ between runs. Query across the whole library by omitting --paper. BM25 scales linearly — add as many as you want.</div>
+          <div class="i-code">python3 test_local.py -f -i 2301.07041
+python3 test_local.py -f -i 2305.10601
+python3 test_local.py -f -i 2005.11401
+python3 test_local.py -q -Q "how do these papers approach retrieval?" -F</div>
+          <div class="i-note">Papers persist at ~/.arxiv-mcp/ between runs. Omit -p to query across your whole library. BM25 scales linearly with no performance penalty.</div>
         </div>
       </div>
       <div class="ist">
         <div class="i-n">4</div>
         <div>
-          <div class="i-title">Check your library and reading list</div>
-          <div class="i-code">python3 test_local.py --library</div>
+          <div class="i-title">Check your library</div>
+          <div class="i-code">python3 test_local.py -l</div>
           <div class="i-note">Lists all indexed papers with titles, authors, chunk counts, and reading list status.</div>
         </div>
       </div>
     </div>
 
-    <!-- Tab: Test MCP protocol -->
     <div class="tab-panel" id="tab-mcp">
       <div class="ist">
-        <div class="i-n" style="font-size:.9rem;padding-top:.3rem">why</div>
+        <div class="i-n" style="font-size:.75rem;padding-top:.4rem">why</div>
         <div>
           <div class="i-title">What test_mcp.py actually does</div>
-          <p class="i-note" style="margin-top:0;line-height:1.8">It spawns the MCP server as a subprocess and sends real JSON-RPC messages over stdin/stdout — byte-for-byte identical to what Claude Desktop sends. If this passes, the Claude Desktop integration will work. It's the closest you can get to testing the full MCP stack without a Pro subscription.</p>
+          <p class="i-note" style="margin-top:0;line-height:1.9">Spawns the MCP server as a real subprocess and sends JSON-RPC messages over stdin/stdout -- byte-for-byte identical to what Claude Desktop sends. Handles the initialize handshake, tool listing, and tool calls. If this passes, Claude Desktop integration will work. It is the closest you can get to testing the full MCP stack without a Pro subscription.</p>
         </div>
       </div>
       <div class="ist">
         <div class="i-n">1</div>
         <div>
-          <div class="i-title">Test all tools at once</div>
+          <div class="i-title">Test all tools</div>
           <div class="i-code">python3 test_mcp.py</div>
-          <div class="i-note">Runs the full initialize handshake, lists tools, and calls list_library and get_reading_list.</div>
+          <div class="i-note">Runs the full MCP handshake, lists registered tools, calls list_library and get_reading_list.</div>
         </div>
       </div>
       <div class="ist">
@@ -339,7 +381,7 @@ python3 test_local.py --query --question "how do these papers approach retrieval
 python3 test_mcp.py --tool fetch_paper --arxiv-id 2005.11401
 python3 test_mcp.py --tool query_library --question "what is BM25?" --paper 2005.11401
 python3 test_mcp.py --tool list_library</div>
-          <div class="i-note">Each call goes through the full MCP protocol stack — tool registration, JSON-RPC serialization, and response parsing.</div>
+          <div class="i-note">Each call goes through the full MCP protocol stack including tool registration, JSON-RPC serialization, and response parsing.</div>
         </div>
       </div>
     </div>
@@ -349,57 +391,73 @@ python3 test_mcp.py --tool list_library</div>
 <!-- EDGE CASES -->
 <section id="edge" class="sect" style="padding-top:0">
   <div class="rv">
-    <div class="sect-eye">Edge cases &amp; fixes</div>
+    <div class="sect-eye">Edge cases and fixes</div>
     <div class="sect-h">Problems we hit.<br><span class="sect-hi">How we solved them.</span></div>
   </div>
   <div class="install rv2">
     <div class="ist">
-      <div class="i-n" style="font-size:1.2rem">429</div>
+      <div class="i-n" style="font-size:1.1rem">429</div>
       <div>
         <div class="i-title">ArXiv API rate limiting</div>
-        <p class="i-note" style="margin-top:0;margin-bottom:.6rem">The ArXiv metadata API limits ~1 request/3 seconds. Burst fetching triggers HTTP 429.</p>
-        <div class="i-code"># Old: blocked on API rate limit
-fetch metadata via API → get PDF URL → download
+        <p class="i-note" style="margin-top:0;margin-bottom:.6rem">The ArXiv metadata API allows roughly 1 request per 3 seconds. Burst fetching triggers HTTP 429 errors that block all requests.</p>
+        <div class="i-code"># Old: blocked waiting for API
+fetch metadata via API, get PDF URL, download
 
-# New: guaranteed, no rate limit
-download PDF directly → https://arxiv.org/pdf/{id}
+# New: guaranteed, no rate limit ever
+download PDF from https://arxiv.org/pdf/{id} directly
 fetch metadata separately with graceful fallback</div>
-        <div class="i-note">PDF hits ArXiv's CDN directly — no rate limit ever. If metadata API is unavailable, placeholder values are used and the paper is still fully indexed and queryable.</div>
+        <div class="i-note">PDF download hits ArXiv CDN directly with no rate limit. If metadata API is unavailable, placeholder values are used and the paper is still fully indexed and queryable. Run the fetch again later to refresh metadata.</div>
       </div>
     </div>
     <div class="ist">
-      <div class="i-n" style="font-size:.9rem;padding-top:.3rem">PDF</div>
+      <div class="i-n" style="font-size:.85rem;padding-top:.35rem">PDF</div>
       <div>
         <div class="i-title">Garbled text from LaTeX PDFs</div>
-        <p class="i-note" style="margin-top:0;margin-bottom:.6rem">pdfplumber misreads LaTeX fonts — producing <span style="color:var(--ice);font-family:var(--mono)">b e a h A b r ξ o a s α</span> instead of sentences.</p>
-        <div class="i-code">pip install pymupdf   # primary extractor
-# pdfplumber remains as automatic fallback
-# post-processing drops lines with avg token length < 1.8 chars</div>
-        <div class="i-note">pymupdf reconstructs reading order from glyph positions and handles multi-column LaTeX layouts correctly.</div>
+        <p class="i-note" style="margin-top:0;margin-bottom:.6rem">Physics and math papers use LaTeX-rendered fonts that pdfplumber misreads, producing output like: <span style="color:var(--ice);font-family:var(--mono)">b e a h A b r o a s</span> instead of real sentences.</p>
+        <div class="i-code">pip install pymupdf
+
+# pymupdf reconstructs reading order from glyph positions
+# handles multi-column layouts and LaTeX math fonts
+# pdfplumber stays as automatic fallback if pymupdf missing
+# post-processing drops lines with avg token length below 1.8 chars</div>
+        <div class="i-note">The 1.8 character threshold is the statistical signature of scrambled LaTeX fonts. Real prose words average 4+ characters per token. The filter removes garbled lines before indexing.</div>
       </div>
     </div>
     <div class="ist">
-      <div class="i-n" style="font-size:.9rem;padding-top:.3rem">ENV</div>
+      <div class="i-n" style="font-size:.85rem;padding-top:.35rem">ENV</div>
       <div>
         <div class="i-title">Anaconda overriding the virtualenv</div>
-        <p class="i-note" style="margin-top:0;margin-bottom:.6rem">Both <span style="color:var(--ice);font-family:var(--mono)">(base)</span> and <span style="color:var(--ice);font-family:var(--mono)">(.venv)</span> in your prompt means conda is winning.</p>
+        <p class="i-note" style="margin-top:0;margin-bottom:.6rem">Seeing both <span style="color:var(--ice);font-family:var(--mono)">(base)</span> and <span style="color:var(--ice);font-family:var(--mono)">(.venv)</span> in your prompt means conda is winning and the wrong Python is running.</p>
         <div class="i-code">conda deactivate
 source .venv/bin/activate
 which python3   # must show .venv path
 
-# Or bypass entirely
-/full/path/.venv/bin/python3 test_local.py --fetch --arxiv-id 2005.11401</div>
-        <div class="i-note">Always use the full absolute .venv path in your Claude Desktop config — avoids the conflict regardless of conda.</div>
+# Or bypass conda entirely
+/full/path/.venv/bin/python3 test_local.py -f -i 2005.11401</div>
+        <div class="i-note">Always use the full absolute .venv path in your Claude Desktop config. This avoids the conflict entirely regardless of what conda does in your shell.</div>
       </div>
     </div>
     <div class="ist">
-      <div class="i-n" style="font-size:.9rem;padding-top:.3rem">OUT</div>
+      <div class="i-n" style="font-size:.85rem;padding-top:.35rem">OUT</div>
       <div>
         <div class="i-title">Truncated terminal output</div>
-        <p class="i-note" style="margin-top:0;margin-bottom:.6rem">Default view shows 600 characters. Long papers or multi-source queries get cut off.</p>
-        <div class="i-code">python3 test_local.py --query --paper 2507.07171 \
-  --question "what methods do they use?" --full</div>
-        <div class="i-note"><span style="color:var(--ice);font-family:var(--mono)">--full</span> removes truncation entirely. Always use it — truncated context is never useful.</div>
+        <p class="i-note" style="margin-top:0;margin-bottom:.6rem">Default view shows 600 characters. Long papers or multi-source queries get cut off. Truncated context is never useful.</p>
+        <div class="i-code"># Always use -F for full output
+python3 test_local.py -q -p 2507.07171 -Q "what methods do they use?" -F</div>
+        <div class="i-note">-F removes truncation entirely. All examples in this site use -F.</div>
+      </div>
+    </div>
+    <div class="ist">
+      <div class="i-n" style="font-size:.85rem;padding-top:.35rem">6/6</div>
+      <div>
+        <div class="i-title">Automated edge case test suite</div>
+        <p class="i-note" style="margin-top:0;margin-bottom:.6rem">Run all 6 edge cases with one command to verify your setup handles every known failure mode.</p>
+        <div class="i-code">python3 test_local.py -e
+
+# Tests: empty library query, paper not found (404),
+# vague queries, cross-paper retrieval, bad arxiv_id_filter,
+# large PDF handling (>40 pages, capped)</div>
+        <div class="i-note">All 6 cases produce graceful output rather than crashes. The suite is also useful after making code changes to confirm nothing regressed.</div>
       </div>
     </div>
   </div>
@@ -412,35 +470,37 @@ which python3   # must show .venv path
     <div class="sect-h">How it works</div>
   </div>
   <div class="vless-box rv">
-    <div class="vless-tag">New in v2</div>
+    <div class="vless-tag">v2 pipeline</div>
     <div class="vless-title">Vectorless RAG</div>
     <p class="vless-copy">
       Traditional RAG embeds every chunk with a neural model and retrieves by cosine similarity.
-      Vectorless RAG replaces the embedding step with <strong>BM25 keyword retrieval</strong> —
-      the same algorithm that powers Elasticsearch and academic search engines.
-      It excels at exact technical terms like <strong>LoRA, RLHF, KV-cache</strong> that dense vectors often miss.
-      Multi-query results are fused with <strong>Reciprocal Rank Fusion (RRF)</strong>,
-      then each chunk is compressed to only the relevant sentences by a sentence-level BM25 pass.
+      Vectorless RAG replaces the embedding step with <strong>BM25 keyword retrieval</strong> --
+      the same algorithm powering Elasticsearch and Google Scholar.
+      It handles exact technical terms like <strong>LoRA, RLHF, KV-cache</strong> that dense vectors often miss.
+      Query expansion via <strong>Groq (free)</strong> generates 3 BM25 variants.
+      Results are fused with <strong>Reciprocal Rank Fusion (RRF)</strong>,
+      then each chunk is compressed to only the relevant sentences. Final answer generated by Groq.
     </p>
     <div class="pipeline">
-      <div class="pipe-step"><div class="ps-n">step 01</div><div class="ps-name">Query expansion</div><div class="ps-desc">Rewrites query into 3 keyword variants to maximize BM25 recall</div></div>
-      <div class="pipe-step"><div class="ps-n">step 02</div><div class="ps-name">Multi-query BM25</div><div class="ps-desc">Okapi BM25 scores all chunks for each variant independently</div></div>
-      <div class="pipe-step"><div class="ps-n">step 03</div><div class="ps-name">RRF fusion</div><div class="ps-desc">score = Σ 1/(60 + rank) — combines 3 ranked lists without score normalization</div></div>
-      <div class="pipe-step"><div class="ps-n">step 04</div><div class="ps-name">Contextual compression</div><div class="ps-desc">Sentence-level BM25 extracts only the 2–3 sentences that answer the question</div></div>
+      <div class="pipe-step"><div class="ps-n">step 01</div><div class="ps-name">Groq query expansion</div><div class="ps-desc">llama-3.1-8b-instant generates 3 domain-specific keyword variants. Free tier, 60s to set up.</div></div>
+      <div class="pipe-step"><div class="ps-n">step 02</div><div class="ps-name">Multi-query BM25</div><div class="ps-desc">Okapi BM25 scores all chunks against each variant independently. No model, no GPU.</div></div>
+      <div class="pipe-step"><div class="ps-n">step 03</div><div class="ps-name">RRF fusion</div><div class="ps-desc">score = sum of 1/(60 + rank). Combines 3 lists without score normalization.</div></div>
+      <div class="pipe-step"><div class="ps-n">step 04</div><div class="ps-name">Compression + generation</div><div class="ps-desc">Sentence BM25 extracts 2-3 relevant sentences. Groq generates a cited final answer.</div></div>
     </div>
   </div>
   <div class="arch-grid rv2">
     <div class="steps">
-      <div class="step"><span class="s-n">01 —</span><div><div class="s-title">Claude calls a tool</div><p class="s-desc">Claude Desktop connects over stdio via MCP. Research questions route to the appropriate tool as structured JSON.</p></div></div>
-      <div class="step"><span class="s-n">02 —</span><div><div class="s-title">PDF downloaded directly</div><p class="s-desc">PDFs fetched from https://arxiv.org/pdf/{id} — ArXiv's CDN with no rate limiting. pymupdf extracts text, handles LaTeX multi-column layouts.</p></div></div>
-      <div class="step"><span class="s-n">03 —</span><div><div class="s-title">Chunking → BM25 index</div><p class="s-desc">500-word chunks with 50-word overlap. Each chunk added to Okapi BM25 instantly — no encode() call, no model.</p></div></div>
-      <div class="step"><span class="s-n">04 —</span><div><div class="s-title">Multi-query retrieval + RRF</div><p class="s-desc">Three BM25 searches fused by RRF. Optional arxiv_id_filter restricts search to one paper.</p></div></div>
-      <div class="step"><span class="s-n">05 —</span><div><div class="s-title">Cited context returned</div><p class="s-desc">Compressed chunks formatted as [Source N] citations in structured JSON. Claude generates a grounded, cited answer.</p></div></div>
+      <div class="step"><span class="s-n">01</span><div><div class="s-title">Claude calls a tool</div><p class="s-desc">Claude Desktop connects over stdio via MCP. Research questions route to the right tool as structured JSON-RPC.</p></div></div>
+      <div class="step"><span class="s-n">02</span><div><div class="s-title">PDF downloaded directly</div><p class="s-desc">PDFs fetched from arxiv.org/pdf/{id} -- ArXiv CDN with no rate limit. pymupdf extracts text and handles LaTeX multi-column layouts.</p></div></div>
+      <div class="step"><span class="s-n">03</span><div><div class="s-title">Chunking and BM25 index</div><p class="s-desc">500-word chunks with 50-word overlap. Each chunk added to Okapi BM25 instantly. No encode() call, no model load, indexing in under 1 second per paper.</p></div></div>
+      <div class="step"><span class="s-n">04</span><div><div class="s-title">Multi-query BM25 and RRF</div><p class="s-desc">Groq expands the query into 3 variants. Three BM25 searches fused by RRF. Optional arxiv_id_filter scopes search to one paper.</p></div></div>
+      <div class="step"><span class="s-n">05</span><div><div class="s-title">Cited answer returned</div><p class="s-desc">Compressed chunks formatted as [Source N] citations. Groq generates a grounded answer. Claude presents it in conversation with full attribution.</p></div></div>
     </div>
     <div class="stack">
       <div class="st-label">Tech stack</div>
       <div class="si"><div class="sdot" style="background:var(--gold)"></div>mcp<span class="stag">protocol</span></div>
       <div class="si"><div class="sdot" style="background:var(--gold)"></div>arxiv<span class="stag">data source</span></div>
+      <div class="si"><div class="sdot" style="background:#7ec87e"></div>groq llama-3.1-8b<span class="stag">generation</span></div>
       <div class="si"><div class="sdot" style="background:var(--ice)"></div>BM25 (built-in)<span class="stag">retrieval</span></div>
       <div class="si"><div class="sdot" style="background:var(--ice)"></div>RRF fusion<span class="stag">ranking</span></div>
       <div class="si"><div class="sdot" style="background:var(--ice)"></div>sentence BM25<span class="stag">compression</span></div>
@@ -454,8 +514,8 @@ which python3   # must show .venv path
 <!-- INSTALL -->
 <section id="install" class="sect" style="padding-top:0">
   <div class="rv">
-    <div class="sect-eye">Claude Pro — Quick start</div>
-    <div class="sect-h">Connect to Claude Desktop<br><span class="sect-hi">in three steps</span></div>
+    <div class="sect-eye">Claude Pro -- connect to Claude Desktop</div>
+    <div class="sect-h">Three steps<br><span class="sect-hi">to connect</span></div>
   </div>
   <div class="install rv2">
     <div class="ist">
@@ -477,11 +537,14 @@ pip install -e .</div>
     "arxiv-research": {
       "command": "/absolute/path/to/.venv/bin/python",
       "args": ["-m", "src.server"],
-      "cwd": "/absolute/path/to/arvix-mcp-server"
+      "cwd": "/absolute/path/to/arvix-mcp-server",
+      "env": {
+        "GROQ_API_KEY": "gsk_your_key_here"
+      }
     }
   }
 }</div>
-        <div class="i-note">Config at ~/Library/Application Support/Claude/claude_desktop_config.json on macOS. Use the full .venv/bin/python path — avoids Anaconda conflicts.</div>
+        <div class="i-note">Config at ~/Library/Application Support/Claude/claude_desktop_config.json on macOS. Use the full .venv/bin/python path to avoid Anaconda conflicts. Adding GROQ_API_KEY here enables answer generation inside Claude.</div>
       </div>
     </div>
     <div class="ist">
@@ -491,8 +554,9 @@ pip install -e .</div>
         <div class="i-code">"Search for papers on speculative decoding"
 "Fetch paper 2305.10601 and index it"
 "What does paper 2507.07171 say about the methodology?"
-"What does my library say about KV cache optimization?"</div>
-        <div class="i-note">Claude calls the tools automatically. Mention a paper ID and it uses arxiv_id_filter to restrict the query to that paper.</div>
+"What does my library say about KV cache optimization?"
+"Compare the retrieval approaches across my indexed papers"</div>
+        <div class="i-note">Claude calls the tools automatically. When you mention a paper ID, it uses arxiv_id_filter to scope the query to that paper.</div>
       </div>
     </div>
   </div>
@@ -502,10 +566,10 @@ pip install -e .</div>
   <div class="f-logo">ArXiv MCP</div>
   <div class="f-links">
     <a href="https://github.com/RatnamOjha/arvix-mcp-server" target="_blank">GitHub</a>
+    <a href="https://console.groq.com" target="_blank">Get Groq key</a>
     <a href="https://modelcontextprotocol.io" target="_blank">MCP Docs</a>
     <a href="https://arxiv.org" target="_blank">ArXiv</a>
     <a href="#edge">Edge cases</a>
-    <a href="#install">Install</a>
   </div>
   <div class="f-copy">MIT License · Built with Python · Ratnam Ojha</div>
 </footer>
@@ -536,23 +600,27 @@ requestAnimationFrame(drawBg);
 const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');obs.unobserve(e.target)}}),{threshold:.1});
 document.querySelectorAll('.rv,.rv2').forEach(el=>obs.observe(el));
 
-function switchTab(id){
+function switchTab(id,btn){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
-  event.target.classList.add('active');
+  btn.classList.add('active');
 }
 
 const lines=[
-  {p:'$ ',t:'python3 test_local.py --search'},null,
-  {o:'[search] querying arxiv...'},
-  {o:'→ "Draft & Verify: LLM Acceleration..." 2024'},
-  {o:'→ "SpecInfer: Accelerating LLM Serving..." 2024'},
+  {p:'$ ',t:'python3 test_local.py -s'},null,
+  {o:'[search] querying arxiv live...'},
+  {o:'-> "Draft & Verify: LLM Acceleration..." 2024'},
+  {o:'-> "SpecInfer: Accelerating LLM Serving..." 2024'},
   {o:''},
-  {p:'$ ',t:'python3 test_local.py --fetch --arxiv-id 2507.07171'},null,
-  {o:'[fetch] downloading pdf directly from CDN...'},
-  {o:'[bm25] indexing 22 chunks · no embeddings'},
-  {ok:'✓ indexed. run --query to ask questions.'},
+  {p:'$ ',t:'python3 test_local.py -f -i 2507.07171'},null,
+  {o:'[fetch] downloading from arxiv CDN...'},
+  {o:'[bm25] indexing 22 chunks, no embeddings'},
+  {o:''},
+  {p:'$ ',t:'python3 test_local.py -q -p 2507.07171 -F'},null,
+  {o:'[groq] expanding query into 3 variants...'},
+  {o:'[bm25+rrf] retrieving and compressing...'},
+  {ok:'[groq] answer generated with citations.'},
 ];
 const tl=document.getElementById('tl'),tout=document.getElementById('tout');
 let li=0,ci=0,ols=[];
